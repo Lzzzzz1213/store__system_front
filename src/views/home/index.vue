@@ -105,7 +105,7 @@ function onGoodClicked(id: number) {
         <div v-for="item in list" :key="item.id" class="list-col">
           <div class="list-item" @click="onGoodClicked(item.id)">
             <div v-if="item.recommendStatus" class="list-item-badge">推荐</div>
-            <van-image class="list-item-photo" :src="`http://127.0.0.1:9000/demo/api/img/media/${item.img_path}`" :alt="item.name" />
+            <van-image class="list-item-photo" :src="`http://192.168.2.104:9000/demo/api/img/media/${item.img_path}`" :alt="item.name" />
             <div class="list-item-info">
               <div class="list-item-title">{{ item.name }}</div>
               <div class="list-item-price">

@@ -3,8 +3,8 @@ import { computed, onMounted, ref, unref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { Dialog, Toast } from 'vant';
 import API_GOODS from '@/apis/goods';
-import API_CART from '@/apis/cart';
-import { shoppingCartAddParams } from '@/apis/cart/typings';
+// import API_CART from '@/apis/cart';
+// import { shoppingCartAddParams } from '@/apis/cart/typings';
 import Plate from '@/components/Plate/index.vue';
 import Sku from '@/components/Sku/index.vue';
 import { ISku, IInitialSku } from '@/components/Sku/typings';
@@ -20,9 +20,9 @@ import { usePage } from '@/hooks/shared/usePage';
 onMounted(() => {
   getGoodsDetail();
 
-  if (unref(hasLogin)) {
-    getCartCount();
-  }
+  // if (unref(hasLogin)) {
+  //   getCartCount();
+  // }
 });
 
 const route = useRoute();
@@ -30,7 +30,7 @@ const router = useRouter();
 const orderStore = useOrderStore();
 const { hasLogin } = usePage();
 
-const picList = ref<Recordable[]>([]);
+const picList = ref<string>();
 const basicInfo = ref<Recordable>({});
 const logistics = ref<Recordable>({});
 const content = ref('');
@@ -56,12 +56,10 @@ const goodDeliveryTitle = computed(() => {
     return `无需配送`;
   }
 });
-
 function getGoodsDetail() {
   API_GOODS.goodsDetail( route.query.id ).then((res) => {
-    console.log(res.data)
     picList.value = res.pic[0].path;
-    basicInfo.value = res.data.introduction;
+    basicInfo.value = res.data;
     logistics.value = res.data?.logistics ?? {};
     content.value = res.data.introduction;
 
@@ -85,7 +83,7 @@ function getGoodsDetail() {
 
     document.title = unref(basicInfo).name;
 
-    getSkuData(res.data.basicInfo, res.data?.properties ?? [], res.data?.skuList ?? []);
+    // getSkuData(res.data.basicInfo, res.data?.properties ?? [], res.data?.skuList ?? []);
     getAfterService();
     // TODO 商品收藏
   });
@@ -156,21 +154,21 @@ const onSkuConfirm = useThrottleFn(
   false,
 );
 
-function getSkuData(basicInfo: Recordable, properties: Recordable[], skuList: Recordable[]) {
-  sku.value = {
-    goodsId: basicInfo.id,
-    stock: basicInfo.stores,
-    price: basicInfo.minPrice,
-    goodInfo: {
-      id: basicInfo.id,
-      pic: basicInfo.pic,
-      name: basicInfo.name,
-      unit: basicInfo.unit,
-    },
-    propList: properties,
-    skuList: skuList.sort((a, b) => a.price - b.price), // 按照商品价格从低到高排序
-  };
-}
+// function getSkuData(basicInfo: Recordable, properties: Recordable[], skuList: Recordable[]) {
+//   sku.value = {
+//     goodsId: basicInfo.id,
+//     stock: basicInfo.stores,
+//     price: basicInfo.minPrice,
+//     goodInfo: {
+//       id: basicInfo.id,
+//       pic: basicInfo.pic,
+//       name: basicInfo.name,
+//       unit: basicInfo.unit,
+//     },
+//     propList: properties,
+//     skuList: skuList.sort((a, b) => a.price - b.price), // 按照商品价格从低到高排序
+//   };
+// }
 
 function onConcatService() {
   Toast('未开放：客服');
@@ -183,84 +181,85 @@ function getAfterService() {
 }
 
 // 购物车
-const cartCount = ref<number | undefined>(undefined);
-function getCartCount() {
-  API_CART.shoppingCartInfo().then((res) => {
-    cartCount.value = res.data?.number as number;
-  });
-}
+// const cartCount = ref<number | undefined>(undefined);
+// function getCartCount() {
+//   API_CART.shoppingCartInfo().then((res) => {
+//     cartCount.value = res.data?.number as number;
+//   });
+// }
 
 function addCartHandle() {
-  const params: shoppingCartAddParams = {
-    goodsId: unref(sku).goodsId,
-    number: unref(initialSku).selectedNum,
-  };
+  // const params: shoppingCartAddParams = {
+  //   goodsId: unref(sku).goodsId,
+  //   number: unref(initialSku).selectedNum,
+  // };
 
   if (unref(initialSku).selectedPropList.length) {
-    params.sku = JSON.stringify(
-      unref(initialSku).selectedPropList.map((v: Recordable) => ({
-        optionId: v.id,
-        optionValueId: v.childId,
-      })),
-    );
+    // params.sku = JSON.stringify(
+    //   unref(initialSku).selectedPropList.map((v: Recordable) => ({
+    //     optionId: v.id,
+    //     optionValueId: v.childId,
+    //   })),
+    // );
   }
 
-  API_CART.shoppingCartAdd(params)
-    .then(() => {
-      Toast('已成功加入购物车');
-      getCartCount();
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  // API_CART.shoppingCartAdd(params)
+  //   .then(() => {
+  //     Toast('已成功加入购物车');
+  //     getCartCount();
+  //   })
+  //   .catch((error) => {
+  //     console.error(error);
+  //   });
 }
 </script>
 
 <template>
   <div class="container">
-    <van-swipe :autoplay="3000" class="swiper">
-        <van-image class="swiper-item-img" fit="contain" :src="`http://127.0.0.1:9000/demo/api/img/media/${picList}`" alt="" />
-    </van-swipe>
-    <div class="swiper-item-img"><img :src="`http://127.0.0.1:9000/demo/api/img/media/${picList}`" alt=""></div>
+    <!--删除轮播改为单图-->
+        <van-image class="swiper-item-img" fit="contain" :src="`http://192.168.2.104:9000/demo/api/img/media/${picList}`" alt="" />
+<!--    <div class="swiper-item-img"><img :src="`http://127.0.0.1:9000/demo/api/img/media/${picList}`" alt=""></div>-->
     <div class="section">
       <div class="price">
         <div class="price-hd">
           <div class="price-current">
             <span class="price-current-symbol">¥</span>
-            <span class="price-current-integer">{{ priceIntegerFormat(goodPrice, goodMaxPrice) }}</span>
+<!--            <span class="price-current-integer">{{ priceIntegerFormat(goodPrice, goodMaxPrice) }}</span>-->
+            <span class="price-current-integer">{{ basicInfo.price }}</span>
             <!-- <span v-if="marketing.type" class="price-tag">{{ marketing.info.label }}</span> -->
           </div>
-          <div v-if="basicInfo.originalPrice > 0" class="price-origin">
-            <span class="price-origin-label">价格</span>
-            <span class="price-origin-symbol">¥</span>
-            <span class="price-origin-integer">{{ decimalFormat(basicInfo.originalPrice) }}</span>
-          </div>
+<!--          <div  class="price-origin">-->
+<!--            <span class="price-origin-label">价格</span>-->
+<!--            <span class="price-origin-symbol">¥</span>-->
+<!--            <span class="price-origin-integer">{{ basicInfo.price }}</span>-->
+<!--          </div>-->
         </div>
       </div>
       <div class="desc">
         <div class="desc-hd">
           <div class="desc-title van-multi-ellipsis--l2">{{ basicInfo.name }}</div>
-          <div v-if="basicInfo.characteristic" class="desc-brief">
-            {{ basicInfo.characteristic }}
+          <div v-if="basicInfo.introduction" class="desc-brief">
+            {{ basicInfo.introduction }}
           </div>
         </div>
       </div>
     </div>
-    <div class="stock van-hairline--top">
-      <div class="stock-item">
-        {{ goodDeliveryTitle }}
-      </div>
-      <!-- <div class="stock-item">购买：{{ basicInfo.numberSells }}</div> -->
-      <div class="stock-item">剩余 {{ basicInfo.stores }}</div>
-    </div>
-    <Coupons title="领券" />
+    <!--有关于库存的结构-->
+<!--    <div class="stock van-hairline&#45;&#45;top">-->
+<!--      <div class="stock-item">-->
+<!--        {{ goodDeliveryTitle }}-->
+<!--      </div>-->
+<!--&lt;!&ndash;       <div class="stock-item">购买：{{ basicInfo.numberSells }}</div>&ndash;&gt;-->
+<!--      <div class="stock-item">剩余 {{ basicInfo.stores }}</div>-->
+<!--    </div>-->
+<!--    <Coupons title="领券" />-->
     <van-cell>
-      <template #title>
-        <div class="cell-bar">
-          <div class="cell-bar-title">服务</div>
-          <div class="cell-bar-text">{{ afterSaleTitle }}</div>
-        </div>
-      </template>
+<!--      <template #title>-->
+<!--        <div class="cell-bar">-->
+<!--          <div class="cell-bar-title">服务</div>-->
+<!--          <div class="cell-bar-text">{{ afterSaleTitle }}</div>-->
+<!--        </div>-->
+<!--      </template>-->
     </van-cell>
     <van-cell v-if="hasSku" :border="false" is-link @click="onSkuShow">
       <template #title>
