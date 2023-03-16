@@ -34,6 +34,9 @@ const picList = ref<string>();
 const basicInfo = ref<Recordable>({});
 const logistics = ref<Recordable>({});
 const content = ref('');
+const detailPic = ref<string>("");
+const detailStore = ref(undefined);
+
 const goodPrice = computed(() => {
   if (unref(hasSku)) {
     return unref(sku).skuList[0].price;
@@ -80,13 +83,20 @@ function getGoodsDetail() {
       });
       return;
     }
-
+    getSkuData( res.pic[0].path , res.data?.properties ?? [], res.data?.skuList ?? []);
+    getAfterService();
     document.title = unref(basicInfo).name;
 
-    // getSkuData(res.data.basicInfo, res.data?.properties ?? [], res.data?.skuList ?? []);
-    getAfterService();
+
     // TODO 商品收藏
   });
+  API_GOODS.goodDetail( route.query.id ).then((res) => {
+    console.log(res)
+    detailPic.value = res.pic[0].path
+    detailStore.value = res.data.store
+
+  })
+
 }
 
 // Sku
@@ -153,22 +163,22 @@ const onSkuConfirm = useThrottleFn(
   1000,
   false,
 );
-
-// function getSkuData(basicInfo: Recordable, properties: Recordable[], skuList: Recordable[]) {
-//   sku.value = {
-//     goodsId: basicInfo.id,
-//     stock: basicInfo.stores,
-//     price: basicInfo.minPrice,
-//     goodInfo: {
-//       id: basicInfo.id,
-//       pic: basicInfo.pic,
-//       name: basicInfo.name,
-//       unit: basicInfo.unit,
-//     },
-//     propList: properties,
-//     skuList: skuList.sort((a, b) => a.price - b.price), // 按照商品价格从低到高排序
-//   };
-// }
+// res.data.store, res.pic[0].path
+function getSkuData(basicInfo: Recordable, properties: Recordable[], skuList: Recordable[]) {
+  sku.value = {
+    goodsId: basicInfo.id,
+    stock: basicInfo.stores,
+    price: basicInfo.minPrice,
+    goodInfo: {
+      id: basicInfo.id,
+      pic: basicInfo,
+      name: basicInfo.name,
+      unit: basicInfo.unit,
+    },
+    propList: properties,
+    skuList: skuList.sort((a, b) => a.price - b.price), // 按照商品价格从低到高排序
+  };
+}
 
 function onConcatService() {
   Toast('未开放：客服');
@@ -217,7 +227,7 @@ function addCartHandle() {
 <template>
   <div class="container">
     <!--删除轮播改为单图-->
-        <van-image class="swiper-item-img" fit="contain" :src="`http://192.168.2.104:9000/demo/api/img/media/${picList}`" alt="" />
+        <van-image class="swiper-item-img" fit="contain" :src="`http://127.0.0.1:9000/demo/api/img/media/${picList}`" alt="" />
 <!--    <div class="swiper-item-img"><img :src="`http://127.0.0.1:9000/demo/api/img/media/${picList}`" alt=""></div>-->
     <div class="section">
       <div class="price">
@@ -272,6 +282,7 @@ function addCartHandle() {
 <!--    <Reputations v-if="basicInfo.id" class="mt10" :goods-id="basicInfo.id" />-->
     <Plate title="商品详情" class="mt10" />
     <div class="goods-content" v-html="content"></div>
+    <van-image class="swiper-item-img" fit="contain" :src="`http://127.0.0.1:9000/demo/api/img/media/${detailPic}`" alt="" />
     <div class="action-bar-perch"></div>
     <!-- 商品导航栏 -->
     <van-action-bar>

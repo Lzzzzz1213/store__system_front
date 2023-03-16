@@ -38,13 +38,10 @@ export const useUserStore = defineStore({
   actions: {
     async login(payload: Recordable = {}) {
       const { provider = 'system', params } = payload;
-
       try {
         const loginProvider = loginProviderType[provider];
-
         const res = await API_USER[loginProvider.apiName](params);
         const { token } = res.data;
-
         this.token = token;
         storage.set('token', token);
         return res.data;

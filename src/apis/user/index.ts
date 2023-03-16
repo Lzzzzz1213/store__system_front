@@ -1,5 +1,15 @@
 import { request } from '@/utils/request';
 
+export interface ILoginData {
+  /** admin 或 editor */
+  username: string
+  /** 密码 */
+  password: string
+  /** 验证码 */
+  // code: string
+  type: string
+}
+
 /**
  * 查看用户资产
  */
@@ -187,7 +197,16 @@ export function userShoppingAddressUpdate(data?: Recordable) {
   });
 }
 
+export function loginApi(data: ILoginData) {
+  return request({
+    url: "/user/login/",
+    method: "post",
+    data: data
+  })
+}
+
 export default {
+  loginApi,
   userAmount,
   userCashLog,
   userDetail,

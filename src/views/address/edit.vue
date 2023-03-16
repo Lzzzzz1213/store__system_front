@@ -2,7 +2,7 @@
   <div class="container">
     <div class="group">
       <van-field v-model="form.name" label="收货人" placeholder="收货人姓名" clearable />
-      <van-field v-model="form.mobile" type="tel" label="手机号码" placeholder="收货人手机号" clearable />
+      <van-field v-model="form.email" type="tel" label="手机号码" placeholder="收货人手机号" clearable />
       <AreaField :model-value="form.areaStr" :code="areaCode" @change="onAreaChange" />
       <van-field
         v-model="form.address"
@@ -40,7 +40,7 @@ export default {
       form: {
         id: '',
         name: '',
-        mobile: '',
+        email: '',
         address: '',
         isDefault: '',
         areaStr: '',
@@ -72,7 +72,7 @@ export default {
         this.form = {
           id: info.id,
           name: info.linkMan,
-          mobile: info.mobile,
+          email: info.mobile,
           address: info.address,
           isDefault: info.isDefault,
           provinceCode: info.provinceId,
@@ -104,7 +104,7 @@ export default {
         return;
       }
 
-      if (!isMobile(this.form.mobile)) {
+      if (!isMobile(this.form.email)) {
         this.$toast('请填写正确的电话');
         return;
       }
@@ -121,7 +121,7 @@ export default {
       const params = {
         address: this.form.address,
         linkMan: this.form.name,
-        mobile: this.form.mobile,
+        email: this.form.email,
         isDefault: this.form.isDefault,
         provinceId: this.form.provinceCode,
         cityId: this.form.cityCode,

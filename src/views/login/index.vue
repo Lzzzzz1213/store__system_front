@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { Toast } from 'vant';
 import Captcha from '@/components/Captcha/index.vue';
 import { loginProviderType } from '@/constants/modules/user';
-import { isMobile } from '@/utils/validate';
+import {isEmail, isMobile} from '@/utils/validate';
 import deviceId from '@/utils/helpers/deviceId';
 import deviceModel from '@/utils/helpers/deviceModel';
 
@@ -27,8 +27,8 @@ function onLoginTypeChange() {
   loginType.value = loginType.value === 'sms' ? 'system' : 'sms';
 }
 
-const { mobile, smsCode, smsTimer, smsText, captchaShow, onSmsBtnClicked, onSmsSend } = useSmsCode();
-const pwd = ref('');
+const { email, smsCode, smsTimer, smsText, captchaShow, onSmsBtnClicked, onSmsSend } = useSmsCode();
+const password = ref('');
 const agree = ref(true);
 
 function goPage(path: string) {
@@ -38,26 +38,27 @@ function goPage(path: string) {
 const submitLoading = ref(false);
 const submitted = computed(() => {
   if (unref(loginType) === 'sms') {
-    return unref(mobile) && unref(smsCode);
+    return unref(email) && unref(smsCode);
   }
 
-  return unref(mobile) && unref(pwd);
+  return unref(email) && unref(password);
 });
 
 function onSubmit() {
-  if (!isMobile(unref(mobile))) {
-    Toast('手机号格式错误');
-    return;
-  }
+  // if (!isEmail(unref(email))) {
+  //   Toast('邮箱错误');
+  //   return;
+  // }
 
   const params: Recordable = {
-    mobile: unref(mobile),
-    deviceId: deviceId(),
-    deviceName: deviceModel(),
+    username: unref(email),
+    // deviceId: deviceId(),
+    // deviceName: deviceModel(),
+    type: 'user'
   };
 
   if (unref(loginType) === 'system') {
-    params.pwd = unref(pwd);
+    params.password = unref(password);
   }
 
   if (unref(loginType) === 'sms') {
@@ -85,22 +86,23 @@ function onSubmit() {
   <div class="container">
     <div class="main">
       <div class="h2">{{ loginProvider.h2 }}</div>
-      <div class="safe-tips">为了你的帐号安全，请用手机号登录</div>
+      <div class="safe-tips">为了你的帐号安全，请用邮箱登录</div>
       <div class="form">
         <div class="form-item">
-          <div class="form-item-country">中国 +86</div>
+          <div class="form-item-country">帐号</div>
           <van-field
-            v-model="mobile"
+            v-model="email"
             class="form-field"
             :border="false"
             type="tel"
-            placeholder="请输入手机号"
+            placeholder="请输入登录帐号"
             clearable
           />
         </div>
         <div v-if="loginType === 'system'" class="form-item">
+          <div class="form-item-country">密码</div>
           <van-field
-            v-model="pwd"
+            v-model="password"
             class="form-field"
             :border="false"
             type="password"
@@ -109,12 +111,13 @@ function onSubmit() {
           />
         </div>
         <div v-if="loginType === 'sms'" class="form-item">
+          <div class="form-item-country">验证码</div>
           <van-field
             v-model="smsCode"
             class="form-field"
             :border="false"
             type="number"
-            placeholder="请输入4位验证码"
+            placeholder="请输入6位验证码"
             clearable
           />
           <template v-if="smsTimer">

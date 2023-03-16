@@ -65,7 +65,7 @@ function onItemClicked(index: number) {
       </div>
       <div class="list-item-bd">
         <div class="list-item-name">
-          {{ item.linkMan }} {{ item.mobile }}
+          {{ item.linkMan }} {{ item.email }}
           <span v-if="item.isDefault" class="list-item-tag">默认</span>
         </div>
         <div class="list-item-address">

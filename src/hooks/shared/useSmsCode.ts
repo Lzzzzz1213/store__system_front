@@ -10,7 +10,7 @@ import { isMobile } from '@/utils/validate';
 export function useSmsCode() {
   const state = reactive({
     // 短信验证码
-    mobile: '',
+    email: '',
     smsCode: '',
     smsTimer: null as TimeoutHandle | null,
     smsText: '获取验证码',
@@ -20,12 +20,12 @@ export function useSmsCode() {
   });
 
   function onSmsBtnClicked() {
-    if (!unref(state.mobile)) {
+    if (!unref(state.email)) {
       Toast('请输入手机号');
       return;
     }
 
-    if (!isMobile(unref(state.mobile))) {
+    if (!isMobile(unref(state.email))) {
       Toast('手机号格式错误');
       return;
     }
@@ -35,7 +35,7 @@ export function useSmsCode() {
 
   function onSmsSend({ requestId, code }) {
     API_VERIFICATION.verificationSmsGet({
-      mobile: unref(state.mobile),
+      mobile: unref(state.email),
       key: requestId,
       picCode: code,
     }).then(() => {

@@ -22,7 +22,7 @@ const router = useRouter();
 const route = useRoute();
 
 const title = ref('免费注册');
-const { mobile, smsCode, smsTimer, smsText, captchaShow, onSmsBtnClicked, onSmsSend } = useSmsCode();
+const { email, smsCode, smsTimer, smsText, captchaShow, onSmsBtnClicked, onSmsSend } = useSmsCode();
 const pwd = ref('');
 const pwd2 = ref('');
 
@@ -35,11 +35,11 @@ const agree = ref(true);
 
 const submitLoading = ref(false);
 const submitted = computed(() => {
-  return unref(mobile) && unref(nick) && unref(smsCode) && unref(pwd) && unref(pwd2);
+  return unref(email) && unref(nick) && unref(smsCode) && unref(pwd) && unref(pwd2);
 });
 
 function onSubmit() {
-  if (!isMobile(unref(mobile))) {
+  if (!isMobile(unref(email))) {
     Toast('手机号格式错误');
     return;
   }
@@ -55,7 +55,7 @@ function onSubmit() {
   }
 
   const params = {
-    mobile: unref(mobile),
+    email: unref(email),
     code: unref(smsCode),
     nick: unref(nick),
     pwd: unref(pwd),
@@ -86,7 +86,7 @@ function onSubmit() {
         <div class="form-item">
           <div class="form-item-country">中国 +86</div>
           <van-field
-            v-model="mobile"
+            v-model="email"
             class="form-field"
             :border="false"
             type="tel"

@@ -4,22 +4,30 @@ import qs from 'qs';
 import { Toast } from 'vant';
 import { getAPI } from '@/utils';
 import { ServiceResult } from './types';
+// import { get } from "lodash-es";
+// import { getToken } from "../cache/cookies"
+
 
 import { useUserStoreWithOut } from '@/store/modules/user';
 
 function createRequest<T = ServiceResult>(config: AxiosRequestConfig): Promise<T> {
+  const userStore = useUserStoreWithOut();
   /**
    * 创建 axios 实例
    */
   const instance: AxiosInstance = axios.create({
     baseURL: getAPI(),
     timeout: 1000 * 5,
+    headers: {
+      // 携带 Token
+      Authorization: "Token " + userStore.getToken,
+      // "Content-Type": get(config, "headers.Content-Type", "application/json")
+    },
     transformRequest: [
       (data, headers) => {
         if (headers['Content-Type']?.includes('form-data')) {
           return data;
         } else {
-          const userStore = useUserStoreWithOut();
           return qs.stringify({ ...data, token: userStore.getToken }); // 序列化请求参数
         }
       },
@@ -142,3 +150,4 @@ function httpErrorHandle(error: AxiosError) {
 }
 
 export const request = createRequest;
+// export const request = createRequestFunction(service)

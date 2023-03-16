@@ -22,6 +22,8 @@
     "dayjs": "^1.11.7",
     "good-storage": "^1.1.1",
     "number-precision": "^1.6.0",
+    "lodash-es": "^4.17.21",
+    "js-cookie": "^3.0.1",
     "pinia": "^2.0.33",
     "postcss-px-to-viewport-8-plugin": "^1.2.0",
     "qs": "^6.11.1",

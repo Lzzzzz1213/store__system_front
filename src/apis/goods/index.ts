@@ -269,6 +269,13 @@ export function goodsList(params) {
     params
   })
 }
+export function goodDetail(id){
+  return request({
+    url: `/commodity/editdetail/?method=detail&id=${id}`,
+    method: "get"
+  })
+}
+
 
 /**
  * 获取商品价格
@@ -343,4 +350,5 @@ export default {
   goodsPriceDay,
   goodsRebate,
   goodsReputation,
+  goodDetail
 };
