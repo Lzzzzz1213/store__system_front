@@ -5,6 +5,7 @@ export interface HttpResult<T = any> {
 }
 
 export interface ServiceResult<T = any> {
+  detail: string;
   code: number;
   msg: string;
   data?: T;

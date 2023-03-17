@@ -1,15 +1,10 @@
 import type { AxiosRequestConfig, AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import axios from 'axios';
-import qs from 'qs';
 import { Toast } from 'vant';
 import { getAPI } from '@/utils';
 import { ServiceResult } from './types';
-// import { get } from "lodash-es";
-// import { getToken } from "../cache/cookies"
 
-
-import { useUserStoreWithOut } from '@/store/modules/user';
-
+import {useUserStoreWithOut} from '@/store/modules/user';
 function createRequest<T = ServiceResult>(config: AxiosRequestConfig): Promise<T> {
   const userStore = useUserStoreWithOut();
   /**
@@ -18,34 +13,18 @@ function createRequest<T = ServiceResult>(config: AxiosRequestConfig): Promise<T
   const instance: AxiosInstance = axios.create({
     baseURL: getAPI(),
     timeout: 1000 * 5,
-    headers: {
-      // 携带 Token
-      Authorization: "Token " + userStore.getToken,
-      // "Content-Type": get(config, "headers.Content-Type", "application/json")
-    },
-    transformRequest: [
-      (data, headers) => {
-        if (headers['Content-Type']?.includes('form-data')) {
-          return data;
-        } else {
-          return qs.stringify({ ...data, token: userStore.getToken }); // 序列化请求参数
-        }
-      },
-    ],
   });
 
   /**
    * 请求拦截器
    */
   instance.interceptors.request.use((config: AxiosRequestConfig) => {
-    // store.getters.token && (config.headers.token = store.getters.token);
-
-    if (config.method === 'get') {
-      // const userStore = useUserStoreWithOut();
-      // config.params = { ...config.params, token: userStore.getToken };
+    if (config.url === '/user/login/'){
+      return config
+    } else {
+      config.headers.Authorization = "Token " + userStore.getToken
+      return config
     }
-
-    return config;
   });
 
   /**
@@ -55,9 +34,6 @@ function createRequest<T = ServiceResult>(config: AxiosRequestConfig): Promise<T
     (response: AxiosResponse<any>) => {
       const result: ServiceResult = response.data;
       const code = response.status;
-      // console.log("result", result)
-      // console.log("code", code)
-      // console.log("response", response)
       if (Number(code) === 200) {
         return result;
       } else if (Number(code) === 700) {
@@ -150,4 +126,3 @@ function httpErrorHandle(error: AxiosError) {
 }
 
 export const request = createRequest;
-// export const request = createRequestFunction(service)

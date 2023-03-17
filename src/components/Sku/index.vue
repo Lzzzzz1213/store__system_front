@@ -172,11 +172,11 @@ function onSubmit() {
           <div class="sku-header-good-price">
             <span class="sku-header-good-price-symbol">¥</span>
             <span class="sku-header-good-price-integer">
-              {{ priceIntegerFormat(selectedSkuComb.price, selectedSkuComb.maxPrice) }}
+              {{ sku.price }}
             </span>
           </div>
           <div class="sku-header-item">
-            剩余 <span class="sku-header-good-stock-num">{{ selectedSkuComb.stock }}</span>
+            剩余 <span class="sku-header-good-stock-num">{{ sku.stock }}</span>
             {{ sku.goodInfo.unit || '件' }}
           </div>
           <div v-if="selectedPropTitle" class="sku-header-item">{{ selectedPropTitle }}</div>

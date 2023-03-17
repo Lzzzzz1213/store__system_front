@@ -1,102 +1,72 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, unref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Dialog, Toast } from 'vant';
+import { Toast } from 'vant';
 import API_GOODS from '@/apis/goods';
-// import API_CART from '@/apis/cart';
-// import { shoppingCartAddParams } from '@/apis/cart/typings';
 import Plate from '@/components/Plate/index.vue';
 import Sku from '@/components/Sku/index.vue';
 import { ISku, IInitialSku } from '@/components/Sku/typings';
-import Coupons from './components/Coupons.vue';
-// import Reputations from './components/Reputations.vue';
-import { decimalFormat, priceIntegerFormat } from '@/utils/format';
 import { getAfterSaleTitle } from '@/model/modules/order/afterSale';
 
 import { useOrderStore } from '@/store/modules/order';
 import { useThrottleFn } from '@vueuse/core';
-import { usePage } from '@/hooks/shared/usePage';
 
 onMounted(() => {
   getGoodsDetail();
-
-  // if (unref(hasLogin)) {
-  //   getCartCount();
-  // }
 });
 
 const route = useRoute();
 const router = useRouter();
 const orderStore = useOrderStore();
-const { hasLogin } = usePage();
-
-const picList = ref<string>();
 const basicInfo = ref<Recordable>({});
-const logistics = ref<Recordable>({});
 const content = ref('');
-const detailPic = ref<string>("");
-const detailStore = ref(undefined);
-
-const goodPrice = computed(() => {
-  if (unref(hasSku)) {
-    return unref(sku).skuList[0].price;
-  } else {
-    return unref(basicInfo).minPrice;
-  }
-});
-const goodMaxPrice = computed(() => {
-  if (unref(hasSku)) {
-    return unref(sku).skuList[unref(sku).skuList.length - 1].price;
-  } else {
-    return '';
-  }
-});
 
 const goodDeliveryTitle = computed(() => {
-  if (unref(basicInfo).logisticsId) {
-    return `运费 ${unref(logistics).isFree ? '包邮' : '不包邮'}`;
-  } else {
-    return `无需配送`;
-  }
+    return `包邮`;
 });
+const commodityInfo = ref<any>({
+  pic: {
+    path: ""
+  },
+  data: {
+    id: undefined,
+    created_time: "",
+    name: "",
+    item_no: undefined,
+    price: "",
+    introduction: "",
+    category: "",
+  }
+})
+const commodityDetail = ref({
+  detail: "",
+  pic: {
+      path: ""
+  },
+  data: {
+    store: "",
+  }
+})
 function getGoodsDetail() {
   API_GOODS.goodsDetail( route.query.id ).then((res) => {
-    picList.value = res.pic[0].path;
-    basicInfo.value = res.data;
-    logistics.value = res.data?.logistics ?? {};
-    content.value = res.data.introduction;
-
-    // 商品已下架
-    if (unref(basicInfo).status === 1) {
-      Toast(unref(basicInfo).statusStr);
-      return;
-    }
-    // 商品库存为0
-    if (unref(basicInfo).stores === 0) {
-      Dialog.confirm({
-        title: '提示',
-        message: '该商品已售罄,去看看其他商品吧！',
-        showCancelButton: false,
-      }).then(() => {
-        // on confirm
-        router.replace({ path: '/home' });
-      });
-      return;
-    }
-    getSkuData( res.pic[0].path , res.data?.properties ?? [], res.data?.skuList ?? []);
-    getAfterService();
-    document.title = unref(basicInfo).name;
-
-
-    // TODO 商品收藏
+    commodityInfo.value.pic.path = res.pic[0].path
+    commodityInfo.value.data.id = res.data.id
+    commodityInfo.value.data.created_time = res.data.created_time
+    commodityInfo.value.data.name = res.data.name
+    commodityInfo.value.data.item_no = res.data.item_no
+    commodityInfo.value.data.price = res.data.price
+    commodityInfo.value.data.introduction = res.data.introduction
+    commodityInfo.value.data.category = res.data.category
+    content.value = commodityInfo.value.data.introduction
+    document.title = unref(commodityInfo).data.name;
   });
   API_GOODS.goodDetail( route.query.id ).then((res) => {
-    console.log(res)
-    detailPic.value = res.pic[0].path
-    detailStore.value = res.data.store
-
+    commodityDetail.value.detail = res.detail
+    commodityDetail.value.pic.path = res.pic[0].path
+    commodityDetail.value.data.store = res.data.store
+    getSkuData(commodityInfo.value, commodityDetail.value)
+    // getAfterService();
   })
-
 }
 
 // Sku
@@ -115,24 +85,6 @@ const initialSku = ref<IInitialSku>({
   selectedProps: {},
   selectedPropList: [],
 });
-
-/**
- * 是否多规格
- */
-const hasSku = computed(() => !!unref(sku).skuList.length);
-
-const goodSelectedSkuTitle = computed(() => {
-  if (unref(hasSku)) {
-    if (unref(initialSku).selectedPropList.length) {
-      return unref(initialSku).selectedPropList.reduce((acc, cur) => `${acc} ${cur.childName}`, '');
-    } else {
-      return unref(sku).propList.reduce((acc, cur) => `${acc} ${cur.name}`, '');
-    }
-  } else {
-    return '';
-  }
-});
-
 function onSkuShow(type: string) {
   skuNextActionType.value = type;
   skuShow.value = true;
@@ -163,20 +115,19 @@ const onSkuConfirm = useThrottleFn(
   1000,
   false,
 );
-// res.data.store, res.pic[0].path
-function getSkuData(basicInfo: Recordable, properties: Recordable[], skuList: Recordable[]) {
+function getSkuData(Info, Detail) {
   sku.value = {
-    goodsId: basicInfo.id,
-    stock: basicInfo.stores,
-    price: basicInfo.minPrice,
+    goodsId: Info.data.id,
+    price: Info.data.price,
+    stock: Detail.data.store,
     goodInfo: {
-      id: basicInfo.id,
-      pic: basicInfo,
-      name: basicInfo.name,
-      unit: basicInfo.unit,
+      id: Info.data.id,
+      pic: Info.pic.path,
+      name: Info.data.name,
+      unit: "件",
     },
-    propList: properties,
-    skuList: skuList.sort((a, b) => a.price - b.price), // 按照商品价格从低到高排序
+    propList: [],
+    skuList: [], // 按照商品价格从低到高排序
   };
 }
 
@@ -186,103 +137,60 @@ function onConcatService() {
 
 // 售后服务
 const afterSaleTitle = ref('');
-function getAfterService() {
-  afterSaleTitle.value = getAfterSaleTitle(unref(basicInfo).afterSale);
-}
-
-// 购物车
-// const cartCount = ref<number | undefined>(undefined);
-// function getCartCount() {
-//   API_CART.shoppingCartInfo().then((res) => {
-//     cartCount.value = res.data?.number as number;
-//   });
+// function getAfterService() {
+//   afterSaleTitle.value = getAfterSaleTitle(unref(basicInfo).afterSale);
 // }
-
-function addCartHandle() {
-  // const params: shoppingCartAddParams = {
-  //   goodsId: unref(sku).goodsId,
-  //   number: unref(initialSku).selectedNum,
-  // };
-
-  if (unref(initialSku).selectedPropList.length) {
-    // params.sku = JSON.stringify(
-    //   unref(initialSku).selectedPropList.map((v: Recordable) => ({
-    //     optionId: v.id,
-    //     optionValueId: v.childId,
-    //   })),
-    // );
-  }
-
-  // API_CART.shoppingCartAdd(params)
-  //   .then(() => {
-  //     Toast('已成功加入购物车');
-  //     getCartCount();
-  //   })
-  //   .catch((error) => {
-  //     console.error(error);
-  //   });
-}
 </script>
 
 <template>
   <div class="container">
-    <!--删除轮播改为单图-->
-        <van-image class="swiper-item-img" fit="contain" :src="`http://127.0.0.1:9000/demo/api/img/media/${picList}`" alt="" />
-<!--    <div class="swiper-item-img"><img :src="`http://127.0.0.1:9000/demo/api/img/media/${picList}`" alt=""></div>-->
+    <van-image class="swiper-item-img" fit="contain" :src="`http://127.0.0.1:9000/demo/api/img/media/${commodityInfo.pic.path}`" alt="">
+      <template v-slot:loading>
+        <van-loading type="spinner" size="20" />
+      </template>
+    </van-image>
+
     <div class="section">
       <div class="price">
         <div class="price-hd">
           <div class="price-current">
             <span class="price-current-symbol">¥</span>
-<!--            <span class="price-current-integer">{{ priceIntegerFormat(goodPrice, goodMaxPrice) }}</span>-->
-            <span class="price-current-integer">{{ basicInfo.price }}</span>
-            <!-- <span v-if="marketing.type" class="price-tag">{{ marketing.info.label }}</span> -->
+            <span class="price-current-integer">{{ commodityInfo.data.price }}</span>
           </div>
-<!--          <div  class="price-origin">-->
-<!--            <span class="price-origin-label">价格</span>-->
-<!--            <span class="price-origin-symbol">¥</span>-->
-<!--            <span class="price-origin-integer">{{ basicInfo.price }}</span>-->
-<!--          </div>-->
         </div>
       </div>
       <div class="desc">
         <div class="desc-hd">
-          <div class="desc-title van-multi-ellipsis--l2">{{ basicInfo.name }}</div>
-          <div v-if="basicInfo.introduction" class="desc-brief">
-            {{ basicInfo.introduction }}
+          <div class="desc-title van-multi-ellipsis--l2">{{ commodityInfo.data.name }} （商品编号:{{commodityInfo.data.item_no}}）</div>
+          <div v-if="commodityInfo.data.introduction" class="desc-brief">
+            {{ commodityInfo.data.introduction}}
           </div>
         </div>
       </div>
     </div>
     <!--有关于库存的结构-->
-<!--    <div class="stock van-hairline&#45;&#45;top">-->
-<!--      <div class="stock-item">-->
-<!--        {{ goodDeliveryTitle }}-->
-<!--      </div>-->
-<!--&lt;!&ndash;       <div class="stock-item">购买：{{ basicInfo.numberSells }}</div>&ndash;&gt;-->
-<!--      <div class="stock-item">剩余 {{ basicInfo.stores }}</div>-->
-<!--    </div>-->
-<!--    <Coupons title="领券" />-->
+    <div class="stock van-hairline--top">
+      <div class="stock-item">
+        {{ goodDeliveryTitle }}
+      </div>
+      <div class="stock-item">剩余 {{ commodityDetail.data.store }}</div>
+    </div>
     <van-cell>
-<!--      <template #title>-->
-<!--        <div class="cell-bar">-->
-<!--          <div class="cell-bar-title">服务</div>-->
-<!--          <div class="cell-bar-text">{{ afterSaleTitle }}</div>-->
-<!--        </div>-->
-<!--      </template>-->
-    </van-cell>
-    <van-cell v-if="hasSku" :border="false" is-link @click="onSkuShow">
       <template #title>
         <div class="cell-bar">
-          <div class="cell-bar-title">{{ initialSku.selectedPropList.length ? '已选' : '选择' }}</div>
-          <div class="cell-bar-text">{{ goodSelectedSkuTitle }}</div>
+          <div class="cell-bar-title">服务</div>
+          <div class="cell-bar-text">七天无理由退款</div>
         </div>
       </template>
     </van-cell>
-<!--    <Reputations v-if="basicInfo.id" class="mt10" :goods-id="basicInfo.id" />-->
     <Plate title="商品详情" class="mt10" />
     <div class="goods-content" v-html="content"></div>
-    <van-image class="swiper-item-img" fit="contain" :src="`http://127.0.0.1:9000/demo/api/img/media/${detailPic}`" alt="" />
+    <van-image class="swiper-item-img" fit="contain" :src="`http://127.0.0.1:9000/demo/api/img/media/${commodityDetail.pic.path}`" alt="">
+      <template v-slot:loading>
+        <van-loading type="spinner" size="20" />
+      </template>
+    </van-image>
+
     <div class="action-bar-perch"></div>
     <!-- 商品导航栏 -->
     <van-action-bar>

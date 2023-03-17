@@ -2,7 +2,7 @@
  * app
  */
 export const app = {
-  name: 'v-shop',
+  name: '基于Python+Vue的前后端分离商城系统',
   link: 'https://github.com/JoeshuTT/v-shop/',
 };
 

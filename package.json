@@ -1,5 +1,5 @@
 {
-  "name": "v-shop",
+  "name": "基于Python+Vue的前后端分离商城系统",
   "version": "3.0.0",
   "private": true,
   "engines": {
