@@ -124,11 +124,10 @@ export function goodsBrandList(data?: Recordable) {
 /**
  * 商品类别
  */
-export function goodsCategoryAll(data?: Recordable) {
+export function goodsCategoryAll() {
   return request({
-    url: `/shop/goods/category/all`,
+    url: "/category/list/",
     method: 'get',
-    params: data,
   });
 }
 
@@ -320,8 +319,15 @@ export function goodsReputation(data?: Recordable) {
     data,
   });
 }
-
+export function goodsByCategory(params) {
+  return request({
+    url: "/commodity/commoditylist/",
+    method: 'get',
+    params,
+  });
+}
 export default {
+  goodsByCategory,
   goodsSeckillGrab,
   goodsVisitLog,
   goodsVisitLogAdd,

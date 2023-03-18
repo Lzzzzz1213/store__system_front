@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, unref } from 'vue';
 import { useRouter } from 'vue-router';
-import API_GOODS from '@/apis/goods';
+import API_GOODS, {goodsByCategory} from '@/apis/goods';
 import Tabbar from '@/components/Tabbar/index.vue';
 import IMAGE_LIST_EMPTY from '@/assets/images/empty/good.png';
 
@@ -55,15 +55,15 @@ function onPage() {
   listLoading.value = true;
 
   const params = {
-    categoryId: categoryList.value[categoryIndex.value].id,
-    page: unref(pageCurrent),
-    pageSize: unref(pageSize),
+    category: categoryList.value[categoryIndex.value].id,
+    currentPage: unref(pageCurrent),
+    size: unref(pageSize),
   };
 
-  API_GOODS.goodsList(params)
+  API_GOODS.goodsByCategory(params)
     .then((res) => {
-      const records = res.data?.result ?? [];
-      const total = res.data?.totalRow ?? 0;
+      const records = res.data ?? [];
+      const total = res.total;
 
       list.value = unref(pageCurrent) === 1 ? records : unref(list).concat(records);
       listLoading.value = false;
@@ -100,14 +100,14 @@ function onGoodClicked(id: number) {
         >
           <div v-for="item in list" :key="item.id" class="list-col">
             <div class="list-item" @click="onGoodClicked(item.id)">
-              <van-image class="list-item-photo" :src="item.pic" :alt="item.name" />
+              <van-image class="list-item-photo" :src="`http://127.0.0.1:9000/demo/api/img/media/${item.img_path}`" :alt="item.name" />
               <div class="list-item-info">
-                <div class="list-item-title">{{ item.name }}</div>
+                <div class="list-item-title">{{ item.name }}（{{item.introduction}}）</div>
                 <div class="list-item-price">
                   <div class="price">
                     <div class="price-current">
                       <span class="price-current-symbol">¥</span>
-                      <span class="price-current-integer">{{ item.minPrice }}</span>
+                      <span class="price-current-integer">{{ item.price }}</span>
                     </div>
                   </div>
                 </div>
