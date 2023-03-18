@@ -3,10 +3,10 @@
     <div class="header">
       <div v-if="hasLogin" class="header-inner" @click="goPage('/profile')">
         <div class="header-tag">个人资料</div>
-        <van-image class="header-avatar" :src="userInfo.avatarUrl || assets.avatar" alt="" @click.stop="onEasterEgg" />
+        <van-image class="header-avatar" :src="userInfo.headurl || assets.avatar" alt="" @click.stop="onEasterEgg" />
         <div class="header-info">
           <div class="header-nick van-ellipsis mb10">
-            {{ userInfo.nick || `还没有昵称` }}
+            {{ userInfo.username || `还没有昵称` }}
           </div>
           <div class="header-sub">
             <span class="header-sub-item">ID {{ userInfo.id }}</span>
@@ -36,15 +36,15 @@
       <div class="group">
         <div class="count-list">
           <div class="count-list-item" @click="goPage('/integral')">
-            <div class="count-list-item-value">{{ countPair(score, 0) }}</div>
+            <div class="count-list-item-value">9999</div>
             <div class="count-list-item-label">积分</div>
           </div>
-          <div class="count-list-item" @click="goPage('/coupon')">
-            <div class="count-list-item-value">{{ countPair(couponCanUse, 0) }}</div>
-            <div class="count-list-item-label">优惠券</div>
-          </div>
+<!--          <div class="count-list-item" @click="goPage('/coupon')">-->
+<!--            <div class="count-list-item-value">{{ countPair(couponCanUse, 0) }}</div>-->
+<!--            <div class="count-list-item-label">优惠券</div>-->
+<!--          </div>-->
           <div class="count-list-item" @click="goPage('/wallet')">
-            <div class="count-list-item-value">{{ countPair(balance) }}</div>
+            <div class="count-list-item-value">9999</div>
             <div class="count-list-item-label">余额</div>
           </div>
         </div>
@@ -101,8 +101,8 @@ import { usePage } from '@/hooks/shared/usePage';
 
 onMounted(() => {
   if (unref(hasLogin)) {
-    userStore.getUserDetail();
-    getCounts();
+    // userStore.getUserDetail();
+    // getCounts();
   }
 });
 
@@ -116,53 +116,53 @@ const score = ref(undefined);
 const couponCanUse = ref(undefined);
 
 // 我的订单
-const orderList = ref<Recordable[]>([
-  {
-    value: '',
-    label: '待付款',
-    icon: 'pending-payment',
-    path: '/order/list?status=0',
-    count: undefined,
-    countKey: 'count_id_no_pay',
-  },
-  {
-    value: '',
-    label: '待发货',
-    icon: 'tosend',
-    path: '/order/list?status=1',
-    count: undefined,
-    countKey: 'count_id_no_transfer',
-  },
-  {
-    value: '',
-    label: '待收货',
-    icon: 'logistics',
-    path: '/order/list?status=2',
-    count: undefined,
-    countKey: 'count_id_no_confirm',
-  },
-  {
-    value: '',
-    label: '评价',
-    icon: 'comment-o',
-    path: '/order/list?status=3',
-    count: undefined,
-    countKey: 'count_id_no_reputation',
-  },
-  {
-    value: '',
-    label: '退款/售后',
-    icon: 'after-sale',
-    path: '/refund',
-    count: undefined,
-  },
-]);
+// const orderList = ref<Recordable[]>([
+//   {
+//     value: '',
+//     label: '待付款',
+//     icon: 'pending-payment',
+//     path: '/order/list?status=0',
+//     count: undefined,
+//     countKey: 'count_id_no_pay',
+//   },
+//   {
+//     value: '',
+//     label: '待发货',
+//     icon: 'tosend',
+//     path: '/order/list?status=1',
+//     count: undefined,
+//     countKey: 'count_id_no_transfer',
+//   },
+//   {
+//     value: '',
+//     label: '待收货',
+//     icon: 'logistics',
+//     path: '/order/list?status=2',
+//     count: undefined,
+//     countKey: 'count_id_no_confirm',
+//   },
+//   {
+//     value: '',
+//     label: '评价',
+//     icon: 'comment-o',
+//     path: '/order/list?status=3',
+//     count: undefined,
+//     countKey: 'count_id_no_reputation',
+//   },
+//   {
+//     value: '',
+//     label: '退款/售后',
+//     icon: 'after-sale',
+//     path: '/refund',
+//     count: undefined,
+//   },
+// ]);
 
 // 常用功能
 const toolList = ref<Recordable[]>([
   { icon: 'balance-o', title: '我的钱包', path: '/wallet' },
   { icon: 'point-gift-o', title: '积分兑换', path: '/integral/exchange' },
-  { icon: 'coupon-o', title: '优惠券', path: '/coupon' },
+  // { icon: 'coupon-o', title: '优惠券', path: '/coupon' },
   { icon: 'location-o', title: '收货地址', path: '/address' },
   { icon: 'setting-o', title: '设置', path: '/setting' },
   { icon: ICON_ART, title: '主题', path: '/theme' },
