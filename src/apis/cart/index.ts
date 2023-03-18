@@ -1,15 +1,15 @@
 import { request } from '@/utils/request';
 import { ServiceResult } from '@/utils/request/types';
-import { shoppingCartAddParams, shoppingCartResult } from './typings';
+import { shoppingCartResult } from './typings';
 
 /**
  * 加入购物车
  */
-export function shoppingCartAdd(data: shoppingCartAddParams) {
-  return request<ServiceResult<shoppingCartResult>>({
-    url: `/shopping-cart/add`,
+export function shoppingCartAdd(data) {
+  return request({
+    url: '/cart/cartput/',
     method: 'post',
-    data,
+    data: data,
   });
 }
 
@@ -27,11 +27,10 @@ export function shoppingCartEmpty(data?: Recordable) {
 /**
  * 读取购物车数据
  */
-export function shoppingCartInfo(data?: Recordable) {
-  return request<ServiceResult<shoppingCartResult>>({
-    url: `/shopping-cart/info`,
+export function shoppingCartInfo(id: any) {
+  return request({
+    url: `/cart/cartget/${id}/`,
     method: 'get',
-    params: data,
   });
 }
 

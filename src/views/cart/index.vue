@@ -9,6 +9,7 @@ import SpainList from '@/components/SpainList/index.vue';
 import { decimalFormat } from '@/utils/format';
 import IMAGE_LIST_EMPTY from '@/assets/images/empty/cart.png';
 import ICON_SHOPPING_CART from '@/assets/videos/shopping-cart.mp4';
+import {useUserStore} from "@/store/modules/user";
 
 import { useOrderStore } from '@/store/modules/order';
 import { usePage } from '@/hooks/shared/usePage';
@@ -48,7 +49,9 @@ const totalGoodCount = computed(() => {
 });
 
 const totalPrice = computed(() => {
-  return unref(selectedList).reduce((acc, cur) => NP.plus(acc, NP.times(cur.price, cur.number)), 0);
+  // console.log(unref(selectedList).reduce((acc, cur) => NP.plus(acc, NP.times(parseFloat(cur.price), cur.number)), 0))
+  // console.log(Number(unref(selectedList).reduce((acc, cur))))
+  return unref(selectedList).reduce((acc, cur) => NP.plus(acc, NP.times(Number(cur.commodity__price), cur.number)), 0);
 });
 
 const selectedAll = computed({
@@ -65,9 +68,10 @@ const selectedAll = computed({
 function getList() {
   listLoading.value = true;
 
-  API_CART.shoppingCartInfo()
+  API_CART.shoppingCartInfo(useUserStore().userInfo.id)
     .then((res) => {
-      list.value = res.data?.items ?? [];
+      list.value = res.data ?? [];
+      console.log(unref(list))
     })
     .finally(() => {
       listLoading.value = false;
@@ -197,21 +201,20 @@ function onSubmit() {
               <div class="list-item-selected">
                 <van-checkbox v-model="item.selected"></van-checkbox>
               </div>
-              <van-image fit="contain" class="list-item-pic" :src="item.pic" />
+              <van-image fit="contain" class="list-item-pic" :src="`http://127.0.0.1:9000/demo/api/img/media/${item.commodity__img__path}`" />
               <div class="list-item-content">
                 <div class="list-item-title">
-                  <span v-if="item.status === 1" style="color: var(--gray-color-5)">【失效】</span>
-                  {{ item.name }}
+                  {{ item.commodity__name }}
                 </div>
                 <div class="list-item-desc">
-                  <div v-if="item.sku && item.sku.length" class="list-item-prop">{{ propTitle(item.sku) }}</div>
+                  <div v-if="item.sku && item.sku.length" class="list-item-prop">{{ item.commodity__name }}</div>
                 </div>
                 <div class="list-item-bottom">
                   <div class="list-item-price">
                     <span class="list-item-price-symbol">¥</span>
-                    <span class="list-item-price-integer">{{ decimalFormat(item.price) }}</span>
+                    <span class="list-item-price-integer">{{ decimalFormat(item.commodity__price) }}</span>
                   </div>
-                  <template v-if="item.status === 0">
+                  <template v-if="1">
                     <van-stepper
                       :model-value="item.number"
                       async-change

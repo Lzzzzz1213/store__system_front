@@ -44,6 +44,9 @@ export const useUserStore = defineStore({
         const { token } = res.data;
         this.token = token;
         storage.set('token', token);
+        storage.set('userInfo', res.data)
+        this.userInfo = res.data
+        console.log(this.userInfo)
         return res.data;
       } catch (error) {
         return Promise.reject(error);

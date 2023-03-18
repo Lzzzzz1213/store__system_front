@@ -3,6 +3,7 @@ import { computed, onMounted, ref, unref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { Toast } from 'vant';
 import API_GOODS from '@/apis/goods';
+import API_CART from '@/apis/cart';
 import Plate from '@/components/Plate/index.vue';
 import Sku from '@/components/Sku/index.vue';
 import { ISku, IInitialSku } from '@/components/Sku/typings';
@@ -10,9 +11,14 @@ import { getAfterSaleTitle } from '@/model/modules/order/afterSale';
 
 import { useOrderStore } from '@/store/modules/order';
 import { useThrottleFn } from '@vueuse/core';
+import {useUserStore} from "@/store/modules/user";
+
 
 onMounted(() => {
   getGoodsDetail();
+  setTimeout(()=>{
+    getSkuData(commodityInfo.value, commodityDetail.value)
+  },1000)
 });
 
 const route = useRoute();
@@ -64,7 +70,6 @@ function getGoodsDetail() {
     commodityDetail.value.detail = res.detail
     commodityDetail.value.pic.path = res.pic[0].path
     commodityDetail.value.data.store = res.data.store
-    getSkuData(commodityInfo.value, commodityDetail.value)
     // getAfterService();
   })
 }
@@ -130,7 +135,21 @@ function getSkuData(Info, Detail) {
     skuList: [], // 按照商品价格从低到高排序
   };
 }
-
+const cart = ref<any>({
+  customer: undefined,
+  commodity: undefined,
+  number: undefined
+})
+function addCartHandle() {
+  cart.value.customer = useUserStore().userInfo.id
+  cart.value.commodity = commodityInfo.value.data.id
+  cart.value.number = unref(initialSku).selectedNum
+  API_CART.shoppingCartAdd(unref(cart)).then((res) =>{
+    Toast(res.msg)
+  }).catch((error) =>{
+    Toast(error)
+  })
+}
 function onConcatService() {
   Toast('未开放：客服');
 }
