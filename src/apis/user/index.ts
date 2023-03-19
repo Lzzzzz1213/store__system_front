@@ -136,7 +136,7 @@ export function userModifyPwd(data?: Recordable) {
  */
 export function userShoppingAddressAdd(data?: Recordable) {
   return request({
-    url: `/user/shipping-address/add`,
+    url: "/address/list/",
     method: 'post',
     data,
   });
@@ -145,11 +145,11 @@ export function userShoppingAddressAdd(data?: Recordable) {
 /**
  * 获取默认收货地址
  */
-export function userShoppingAddressDefault(data?: Recordable) {
+export function userShoppingAddressDefault(id: any) {
+  console.log(id)
   return request({
-    url: `/user/shipping-address/default/v2`,
+    url: `/address/default/?customer_id=${id}`,
     method: 'get',
-    params: data,
   });
 }
 
@@ -178,11 +178,10 @@ export function userShoppingAddressDetail(data?: Recordable) {
 /**
  * 收货地址列表
  */
-export function userShoppingAddressList(data?: Recordable) {
+export function userShoppingAddressList(id: any) {
   return request({
-    url: `/user/shipping-address/list/v2`,
-    method: 'post',
-    data,
+    url: `/address/list/?customer_id=${id}`,
+    method: 'get',
   });
 }
 

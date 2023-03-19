@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, unref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '@/store/modules/user'
 
 import API_USER from '@/apis/user';
 import AddressList from '@/components/AddressList/index.vue';
@@ -44,9 +45,9 @@ function onSelect(item: Recordable, index: number) {
 function getList() {
   listLoading.value = true;
 
-  API_USER.userShoppingAddressList()
+  API_USER.userShoppingAddressList(useUserStore().userInfo.id)
     .then((res) => {
-      list.value = res.data?.result ?? [];
+      list.value = res.data?? [];
 
       if (unref(list).length) {
         addressId.value = unref(list)[0].id;

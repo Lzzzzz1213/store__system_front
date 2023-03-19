@@ -49,8 +49,6 @@ const totalGoodCount = computed(() => {
 });
 
 const totalPrice = computed(() => {
-  // console.log(unref(selectedList).reduce((acc, cur) => NP.plus(acc, NP.times(parseFloat(cur.price), cur.number)), 0))
-  // console.log(Number(unref(selectedList).reduce((acc, cur))))
   return unref(selectedList).reduce((acc, cur) => NP.plus(acc, NP.times(Number(cur.commodity__price), cur.number)), 0);
 });
 
@@ -151,6 +149,7 @@ function cartRemoveHandle() {
 }
 
 function onSubmit() {
+  console.log(selectedList)
   if (!unref(selectedList).length) {
     Toast({
       message: '您还没有选择商品哦',
@@ -158,14 +157,14 @@ function onSubmit() {
     });
     return;
   }
-
-  if (unref(selectedList).some((v) => v.status === 1)) {
-    Toast({
-      message: '请删除掉失效商品',
-      duration: 1500,
-    });
-    return;
-  }
+  //
+  // if (unref(selectedList).some((v) => v.status === 1)) {
+  //   Toast({
+  //     message: '请删除掉失效商品',
+  //     duration: 1500,
+  //   });
+  //   return;
+  // }
   orderStore.setTradeGoods({
     origin: 'cart',
     list: unref(selectedList),

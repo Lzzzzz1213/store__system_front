@@ -19,6 +19,7 @@
 import API_USER from '@/apis/user';
 import SpainList from '@/components/SpainList/index.vue';
 import AddressList from '@/components/AddressList/index.vue';
+import {useUserStore} from "@/store/modules/user";
 
 export default {
   components: { SpainList, AddressList },
@@ -64,9 +65,10 @@ export default {
     getList() {
       this.listLoading = true;
 
-      API_USER.userShoppingAddressList()
+      API_USER.userShoppingAddressList(useUserStore().userInfo.id)
         .then((res) => {
-          this.list = res.data?.result ?? [];
+          this.list = res.data?? [];
+          console.log("this.list", this.list)
         })
         .finally(() => {
           this.listLoading = false;

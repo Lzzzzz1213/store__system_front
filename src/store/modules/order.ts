@@ -6,11 +6,11 @@ import { router } from '@/router';
 import API_ORDER from '@/apis/order';
 
 export interface ITradeGoodItem {
-  goodsId: string;
-  name: string;
+  commodity_id: string;
+  commodity__name: string;
   number: number;
-  pic: string;
-  price: number;
+  commodity__img__path: string;
+  commodity__price: number;
   logisticsId: number;
   propertyList: Array<any>;
 }
@@ -42,11 +42,11 @@ export const useOrderStore = defineStore({
       if (origin === 'cart') {
         list.forEach((v: any) => {
           goodList.push({
-            goodsId: v.goodsId,
-            name: v.name,
+            commodity_id: v.commodity_id,
+            commodity__name: v.commodity__name,
             number: v.number,
-            pic: v.pic,
-            price: v.price,
+            commodity__img__path: v.commodity__img__path,
+            commodity__price: v.commodity__price,
             logisticsId: v.logisticsId,
             propertyList: v.sku?.length
               ? v.sku.map((v: any) => ({

@@ -3,7 +3,7 @@
     <div class="group">
       <van-field v-model="form.name" label="收货人" placeholder="收货人姓名" clearable />
       <van-field v-model="form.email" type="tel" label="手机号码" placeholder="收货人手机号" clearable />
-      <AreaField :model-value="form.areaStr" :code="areaCode" @change="onAreaChange" />
+      <AreaField :model-value="form.fullArea" :code="areaCode" @change="onAreaChange" />
       <van-field
         v-model="form.address"
         label="详细地址"
@@ -30,6 +30,7 @@
 import API_USER from '@/apis/user';
 import { isEmpty, isMobile } from '@/utils/validate';
 import AreaField from '@/components/AreaField/index.vue';
+import {useUserStore} from "@/store/modules/user";
 
 export default {
   components: {
@@ -42,12 +43,15 @@ export default {
         name: '',
         email: '',
         address: '',
-        isDefault: '',
+        isDefault: false,
         areaStr: '',
         areaCode: '',
         provinceCode: '',
         cityCode: '',
         countyCode: '',
+        provinceStr: '',
+        cityStr: '',
+        fullArea: '',
       },
     };
   },
@@ -78,7 +82,7 @@ export default {
           provinceCode: info.provinceId,
           cityCode: info.cityId,
           countyCode: info.districtId,
-          areaStr: this.formatAreaStr(info.provinceStr, info.cityStr, info.areaStr),
+          areaStr: this.formatAreaStr(info.provinceId, info.cityId, info.areaStr),
         };
       });
     }
@@ -86,9 +90,12 @@ export default {
   methods: {
     onAreaChange(values) {
       this.form.provinceCode = values[0].code;
+      this.form.provinceStr = values[0].name;
       this.form.cityCode = values[1].code;
+      this.form.cityStr = values[1].name;
       this.form.countyCode = values[2].code;
-      this.form.areaStr = this.formatAreaStr(values[0].name, values[1].name, values[2].name);
+      this.form.areaStr = values[2].name
+      this.form.fullArea = this.formatAreaStr(values[0].name, values[1].name, values[2].name);
     },
     formatAreaStr(provinceStr, cityStr, countyStr) {
       let str = provinceStr;
@@ -119,13 +126,17 @@ export default {
       }
 
       const params = {
+        customer: useUserStore().userInfo.id,
         address: this.form.address,
         linkMan: this.form.name,
-        email: this.form.email,
+        mobile: this.form.email,
         isDefault: this.form.isDefault,
         provinceId: this.form.provinceCode,
         cityId: this.form.cityCode,
         districtId: this.form.countyCode,
+        cityStr: this.form.cityStr,
+        provinceStr: this.form.provinceStr,
+        areaStr: this.form.areaStr
       };
 
       this.$toast.loading({

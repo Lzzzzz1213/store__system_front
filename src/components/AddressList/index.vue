@@ -1,9 +1,6 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
 import { useRouter } from 'vue-router';
-
-const router = useRouter();
-
 const props = defineProps({
   modelValue: [Number, String],
   list: {
@@ -12,8 +9,8 @@ const props = defineProps({
   },
   switchable: Boolean,
 });
-
 const emit = defineEmits(['select', 'update:modelValue']);
+const router = useRouter();
 
 function onSelect(index: number) {
   const item = props.list[index];
@@ -65,7 +62,7 @@ function onItemClicked(index: number) {
       </div>
       <div class="list-item-bd">
         <div class="list-item-name">
-          {{ item.linkMan }} {{ item.email }}
+          {{ item.linkMan }} {{ item.mobile }}
           <span v-if="item.isDefault" class="list-item-tag">默认</span>
         </div>
         <div class="list-item-address">

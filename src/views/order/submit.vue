@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, unref } from 'vue';
+import {computed, onBeforeMount, onMounted, ref, unref} from 'vue';
 import { useRouter } from 'vue-router';
 import { Dialog, Toast } from 'vant';
 import NP from 'number-precision';
-import API_USER from '@/apis/user';
+import API_USER, {userShoppingAddressDefault} from '@/apis/user';
 import API_ORDER from '@/apis/order';
 import API_CART from '@/apis/cart';
 import { decimalFormat, mobileShow } from '@/utils/format';
 import SelectAddress from './components/SelectAddress.vue';
 import GoodCard from '@/components/GoodCard/index.vue';
-
+import { useUserStore } from '@/store/modules/user'
 import { useOrderStore } from '@/store/modules/order';
 
 onMounted(() => {
@@ -46,8 +46,9 @@ function onAddressSelected(item: Recordable) {
 }
 
 function getAddressInfo() {
-  API_USER.userShoppingAddressDefault().then((res) => {
-    addressInfo.value = res.data?.info ?? {};
+  console.log("2131321", useUserStore().userInfo.id)
+  API_USER.userShoppingAddressDefault(useUserStore().userInfo.id).then((res) => {
+    addressInfo.value = res.data ?? [];
   });
 }
 
@@ -74,7 +75,7 @@ const submitLoading = ref(false);
 // 只要包含一件实物商品，就需要物流信息
 const isNeedLogistics = computed(() => unref(goodList).some((v: Recordable) => v.logisticsId !== 0));
 const totalPrice = computed(() =>
-  unref(goodList).reduce((acc, cur) => NP.plus(acc, NP.times(cur.price, cur.number)), 0),
+  unref(goodList).reduce((acc, cur) => NP.plus(acc, NP.times(Number(cur.commodity__price), cur.number)), 0),
 );
 
 function onSubmit() {
@@ -104,7 +105,7 @@ function onSubmit() {
  */
 async function createOrder() {
   const goods = unref(goodList).map((item) => ({
-    goodsId: item.goodsId,
+    goodsId: item.commodity_id,
     number: item.number,
     propertyChildIds: item.propertyList.map((v) => v.propIds).join(','),
   }));

@@ -24,9 +24,9 @@ export default defineComponent({
 
 <template>
   <div class="good-card">
-    <van-image fit="contain" class="good-card-pic" :src="good.pic" />
+    <van-image fit="contain" class="good-card-pic" :src="`http://127.0.0.1:9000/demo/api/img/media/${good.commodity__img__path}`" />
     <div class="good-card-content">
-      <div class="good-card-title">{{ good.name }}</div>
+      <div class="good-card-title">{{ good.commodity__name }}</div>
       <div class="good-card-desc">
         <div v-if="good.propertyList && good.propertyList.length" class="good-card-prop">
           {{ propTitle(good.propertyList) }}
@@ -35,7 +35,7 @@ export default defineComponent({
       <div class="good-card-bottom">
         <div class="good-card-price">
           <span class="good-card-price-symbol">¥</span>
-          <span class="good-card-price-integer">{{ decimalFormat(good.price) }}</span>
+          <span class="good-card-price-integer">{{ decimalFormat(good.commodity__price) }}</span>
         </div>
         <div class="good-card-number">x{{ good.number }}</div>
       </div>

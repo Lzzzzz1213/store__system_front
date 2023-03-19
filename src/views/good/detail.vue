@@ -105,13 +105,13 @@ const onSkuConfirm = useThrottleFn(
         origin: 'buy',
         list: [
           {
-            goodsId: unref(sku).goodsId,
-            name: unref(sku).goodInfo.name,
+            commodity_id: unref(sku).goodsId,
+            commodity__name: unref(sku).goodInfo.name,
             number: unref(initialSku).selectedNum,
-            pic: unref(sku).goodInfo.pic,
-            price: data.selectedSkuComb.price,
-            logisticsId: unref(basicInfo).logisticsId,
-            propertyList: unref(initialSku).selectedPropList,
+            commodity__img__path: unref(sku).goodInfo.pic,
+            commodity__price: data.selectedSkuComb.price,
+            // logisticsId: unref(basicInfo).logisticsId,
+            // propertyList: unref(initialSku).selectedPropList,
           },
         ],
       });
