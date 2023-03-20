@@ -16,7 +16,7 @@ export function peisonFeeList(data?: Recordable) {
  */
 export function orderClose(data?: Recordable) {
   return request({
-    url: `/order/close`,
+    url: `/order/close/`,
     method: 'post',
     data,
   });
@@ -26,9 +26,10 @@ export function orderClose(data?: Recordable) {
  * 创建订单[下单]
  */
 export function orderCreate(data?: Recordable) {
+  console.log(data)
   return request({
-    url: `/order/create`,
-    method: 'post',
+    url: "/order/create/",
+    method: "post",
     data,
   });
 }
@@ -69,11 +70,12 @@ export function orderDetail(data?: Recordable) {
 /**
  * 订单列表
  */
-export function orderList(data?: Recordable) {
+export function orderList(id: any, data?: Recordable) {
+  console.log(data)
   return request({
-    url: `/order/list`,
-    method: 'post',
-    data,
+    url: `/order/customer/${id}/`,
+    method: "get",
+    params:data
   });
 }
 

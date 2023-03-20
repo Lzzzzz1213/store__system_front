@@ -6,16 +6,14 @@ import Price from '@/components/Price/index.vue';
 import { decimalFormat } from '@/utils/format';
 
 import { useOrderStore } from '@/store/modules/order';
-
-const router = useRouter();
-const orderStore = useOrderStore();
-
 defineProps({
   item: { type: Object as PropType<Recordable>, default: () => {} },
+  first: { type: Object as PropType<Recordable>, default: () => {} },
   index: { type: Number, default: 0 },
 });
-
 const emit = defineEmits(['delete']);
+const router = useRouter();
+const orderStore = useOrderStore();
 
 function onOrderClicked(item: Recordable) {
   const { orderNumber } = item;
@@ -56,46 +54,47 @@ function onOrderDelete(item: Recordable, index: number) {
     });
 }
 </script>
-
 <template>
+<!--  {{ JSON.parse()}}-->
   <div class="list-item">
     <div class="list-item-header van-hairline--bottom">
       <div class="list-item-header-hd">
-        <span class="title">订单编号：{{ item.orderNumber }}</span>
+        <span class="title">订单编号：{{ item.order_no }}</span>
       </div>
       <div :class="['list-item-header-state', item.status !== -1 ? 'text-brand-color' : '']">
         {{ item.statusStr }}
       </div>
+
     </div>
     <div class="list-item-body" @click="onOrderClicked(item)">
-      <div v-if="item.goodsInfo" class="good-card">
-        <van-image fit="contain" class="good-card-pic" :src="item.goodsInfo.pic" />
+      <div  class="good-card">
+        <van-image fit="contain" class="good-card-pic" :src="`http://127.0.0.1:9000/demo/api/img/media/${JSON.parse(item.details)[0].commodity_path}`" />
         <div class="good-card-content">
           <div class="good-card-content-hd">
-            <div class="good-card-title">{{ item.goodsInfo.goodsName }}</div>
-            <div v-if="item.goodsInfo.property" class="good-card-prop">{{ item.goodsInfo.property }}</div>
+            <div class="good-card-title">{{ JSON.parse(item.details)[0].commodity_name }}</div>
+<!--            <div v-if="item.goodsInfo.property" class="good-card-prop">{{ item.goodsInfo.property }}</div>-->
           </div>
           <div class="good-card-content-bd">
-            <div class="good-card-price">¥{{ decimalFormat(item.goodsInfo.amount) }}</div>
-            <div class="good-card-number">x{{ item.goodsInfo.number }}</div>
+            <div class="good-card-price">¥{{ decimalFormat(JSON.parse(item.details)[0].price) }}</div>
+            <div class="good-card-number">x{{ JSON.parse(item.details)[0].number }}</div>
           </div>
         </div>
       </div>
-      <div v-if="item.goodsNumber > 1" class="list-item-more">查看全部{{ item.goodsNumber }}件商品</div>
+      <div v-if="JSON.parse(item.details).length > 1" class="list-item-more">查看全部{{ item.goodsNumber }}件商品</div>
       <div class="list-item-total van-hairline--top">
-        <span class="list-item-total-number">共{{ item.goodsNumber }}件商品</span>
+        <span class="list-item-total-number">共{{ JSON.parse(item.details).length }}种商品</span>
         <div class="list-item-total-price">
-          <span class="list-item-total-price-label"> {{ item.status === 0 ? '需付款：' : '实付款：' }}</span>
-          <Price :price="item.amountReal" />
+          <span class="list-item-total-price-label"> {{ Number(item.status) === 0 ? '需付款：' : '实付款：' }}</span>
+          <Price :price="item.payment_amount" />
         </div>
       </div>
     </div>
     <!-- ▼ 操作按钮组（一行最好不要超过3个） -->
     <div class="list-item-footer van-hairline--top">
-      <template v-if="item.status === -1 || item.status === 3 || item.status === 4">
+      <template v-if="Number(item.status) === 0 || item.status === 3 || item.status === 4">
         <van-button class="list-item-action-btn" round @click.stop="onOrderDelete(item, index)"> 删除订单 </van-button>
       </template>
-      <template v-if="item.status === 0">
+      <template v-if="Number(item.status) === 0">
         <van-button class="list-item-action-btn" round plain @click.stop="onOrderCancel(item)"> 取消订单 </van-button>
         <van-button class="list-item-action-btn" round plain type="primary" @click.stop="onOrderClicked(item)">
           去支付
@@ -106,10 +105,10 @@ function onOrderDelete(item: Recordable, index: number) {
           联系客服
         </van-button>
       </template>
-      <template v-if="item.status === 2">
+      <template v-if="Number(item.status) === 2">
         <van-button class="list-item-action-btn" round @click.stop="onOrderClicked(item)">确认收货</van-button>
       </template>
-      <template v-if="item.status === 3">
+      <template v-if="Number(item.status) === 3">
         <van-button class="list-item-action-btn" round @click.stop="onOrderClicked(item)">评价</van-button>
       </template>
     </div>

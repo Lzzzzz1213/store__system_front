@@ -6,7 +6,7 @@ import API_ORDER from '@/apis/order';
 import ProList from '@/components/ProList/index.vue';
 import OrderItem from './components/OrderItem.vue';
 import { orderListModel } from '@/model/modules/order/list';
-
+import { useUserStore } from  '@/store/modules/user'
 onMounted(() => {
   const { status } = route.query;
   if (status) {
@@ -53,8 +53,8 @@ function onOrderDelete(_item, index) {
 
 function loadList() {
   const params: Recordable = {
-    page: pagination.pageCurrent,
-    pageSize: pagination.pageSize,
+    currentPage: pagination.pageCurrent,
+    size: pagination.pageSize,
     status: unref(tabList)[unref(active)].status,
   };
 
@@ -64,7 +64,7 @@ function loadList() {
 
   listEmptyText.value = unref(listQueryType) === 'search' ? '未找到符合条件数据' : '暂无订单';
 
-  return API_ORDER.orderList(params);
+  return API_ORDER.orderList(useUserStore().userInfo.id,params);
 }
 
 function loadListAfter(data) {
@@ -96,7 +96,6 @@ function loadListAfter(data) {
         </van-tabs>
       </div>
     </van-sticky>
-
     <ProList
       ref="listRef"
       :api="loadList"
@@ -104,8 +103,8 @@ function loadListAfter(data) {
       :pagination="pagination"
       :empty-text="listEmptyText"
     >
-      <template #item="{ item, index }">
-        <OrderItem :key="item.id" :item="item" :index="index" @delete="onOrderDelete" />
+      <template #item="{ item, index ,first}">
+        <OrderItem :key="item.id" :item="item" :first="first" :index="index" @delete="onOrderDelete" />
       </template>
     </ProList>
   </div>

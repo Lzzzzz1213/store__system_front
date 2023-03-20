@@ -16,11 +16,10 @@ export function shoppingCartAdd(data) {
 /**
  * 清空购物车
  */
-export function shoppingCartEmpty(data?: Recordable) {
+export function shoppingCartEmpty(id: any) {
   return request({
-    url: `/shopping-cart/empty`,
-    method: 'post',
-    data,
+    url: `/cart/emptcart/${id}/`,
+    method: "delete",
   });
 }
 

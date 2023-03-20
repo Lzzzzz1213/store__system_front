@@ -11,6 +11,7 @@ import SelectAddress from './components/SelectAddress.vue';
 import GoodCard from '@/components/GoodCard/index.vue';
 import { useUserStore } from '@/store/modules/user'
 import { useOrderStore } from '@/store/modules/order';
+import {nanoid} from 'nanoid';
 
 onMounted(() => {
   if (unref(isNeedLogistics)) {
@@ -84,18 +85,18 @@ function onSubmit() {
     return;
   }
 
-  if (unref(balance) < unref(totalPrice)) {
-    Dialog.confirm({
-      title: '余额不足',
-      message: '积分兑换成余额，再来消费',
-      confirmButtonText: '我知道了',
-    })
-      .then(() => {})
-      .catch(() => {
-        // on cancel
-      });
-    return;
-  }
+  // if (unref(balance) < unref(totalPrice)) {
+  //   Dialog.confirm({
+  //     title: '余额不足',
+  //     message: '积分兑换成余额，再来消费',
+  //     confirmButtonText: '我知道了',
+  //   })
+  //     .then(() => {})
+  //     .catch(() => {
+  //       // on cancel
+  //     });
+  //   return;
+  // }
 
   createOrder();
 }
@@ -105,27 +106,29 @@ function onSubmit() {
  */
 async function createOrder() {
   const goods = unref(goodList).map((item) => ({
-    goodsId: item.commodity_id,
+    commodity_id: item.commodity_id,
+    commodity_name: item.commodity__name,
+    commodity_path: item.commodity__img__path,
+    price: item.commodity__price,
     number: item.number,
-    propertyChildIds: item.propertyList.map((v) => v.propIds).join(','),
   }));
 
   const params: Recordable = {
-    calculate: false, // true 不实际下单，而是返回价格计算
-    goodsType: 0, // 自营商品
-    goodsJsonStr: JSON.stringify(goods), // 购买的商品信息的数组
-    expireMinutes: unref(orderSetInfo).closeMinute || 60, // 多少分钟未支付自动关闭本订单，传0不自动关闭订单
-    remark: unref(remark),
+    // calculate: false, // true 不实际下单，而是返回价格计算
+    // goodsType: 0, // 自营商品
+
+    details: JSON.stringify(goods), // 购买的商品信息的数组
+    // expireMinutes: unref(orderSetInfo).closeMinute || 60, // 多少分钟未支付自动关闭本订单，传0不自动关闭订单
+    remark: unref(remark) || "sdadasda",
   };
 
   if (unref(isNeedLogistics)) {
-    params.peisongType = 'kd'; // 配送类型，kd 代表快递；zq代表到店自取
-    params.linkMan = unref(addressInfo).linkMan;
-    params.mobile = unref(addressInfo).mobile;
-    params.address = unref(addressInfo).address;
-    params.provinceId = unref(addressInfo).provinceId;
-    params.cityId = unref(addressInfo).cityId;
-    params.districtId = unref(addressInfo).districtId;
+    params.order_no = nanoid()
+    params.shipping_address = unref(addressInfo).id;
+    params.order_amount = unref(totalPrice);
+    params.payment_amount = unref(totalPrice);
+    params.status = 0;
+    params.customer = useUserStore().userInfo.id;
   } else {
     params.autoDeliver = true; // 虚拟商品，自动发货
   }
@@ -138,22 +141,23 @@ async function createOrder() {
   submitLoading.value = true;
 
   try {
+    console.log(params)
     const res = await API_ORDER.orderCreate(params);
 
     if (unref(tradeGoods).origin === 'cart') {
       cartEmptyHandle();
     }
 
-    await payOrder(res.data.id);
+    // await payOrder(res.data.id);
+    Toast("订单创建成功!")
+    setTimeout(() => {
+      Toast.clear();
+      submitLoading.value = false;
+      router.replace({
+        path: '/cart'
+      });
+    },5000)
 
-    Toast.clear();
-    submitLoading.value = false;
-    router.replace({
-      path: '/order/payResult',
-      query: {
-        orderNumber: res.data.orderNumber,
-      },
-    });
   } catch (error) {
     Toast.clear();
     submitLoading.value = false;
@@ -172,7 +176,7 @@ function payOrder(orderId: number) {
  * 下单商品购物车来源时，直接清空购物车（ TODO: 考虑是否选中）
  */
 function cartEmptyHandle() {
-  API_CART.shoppingCartEmpty()
+  API_CART.shoppingCartEmpty(useUserStore().userInfo.id)
     .then(() => {})
     .catch((error) => {
       console.log(error);

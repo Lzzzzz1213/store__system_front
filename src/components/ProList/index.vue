@@ -61,7 +61,7 @@ export default defineComponent({
     },
   },
   setup(props, { expose }) {
-    const list = ref<Recordable[]>([]);
+    const list = ref<any>([]);
     const loading = ref(false);
     const error = ref(false);
     const finished = ref(false);
@@ -97,14 +97,18 @@ export default defineComponent({
       props
         .api()
         .then((res) => {
-          let records = res.data?.result ?? [];
-          const total = res.data?.totalRow ?? 0;
-
-          if (props.afterFetch && isFunction(props.afterFetch)) {
-            records = props.afterFetch(res.data);
-          }
-
+          let records = res.data ?? [];
+          const total = res.total ?? 0;
+          // if (props.afterFetch && isFunction(props.afterFetch)) {
+          //   records = props.afterFetch(res.data);
+          //   console.log(records)
+          // }
+          let first =  res.first;
           list.value = props.pagination.pageCurrent === 1 ? records : list.value.concat(records);
+          // list.value.first = first
+          console.log(list)
+          // list.value = list.value.concat(first)
+          // console.log(list)
           finished.value = list.value.length >= total;
         })
         .catch((err) => {
@@ -148,6 +152,7 @@ export default defineComponent({
     :direction="direction"
     @load="onLoadMore"
   >
+<!--    {{list[1].commodity__img__path}}-->
     <template v-for="(item, index) in list">
       <slot name="item" v-bind="{ item, index }"></slot>
     </template>
