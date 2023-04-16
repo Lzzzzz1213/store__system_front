@@ -35,17 +35,17 @@
       <!-- 我的钱包 -->
       <div class="group">
         <div class="count-list">
-          <div class="count-list-item" @click="goPage('/integral')">
-            <div class="count-list-item-value">9999</div>
-            <div class="count-list-item-label">积分</div>
-          </div>
+<!--          <div class="count-list-item" @click="goPage('/integral')">-->
+<!--            <div class="count-list-item-value">0</div>-->
+<!--            <div class="count-list-item-label">积分</div>-->
+<!--          </div>-->
 <!--          <div class="count-list-item" @click="goPage('/coupon')">-->
 <!--            <div class="count-list-item-value">{{ countPair(couponCanUse, 0) }}</div>-->
 <!--            <div class="count-list-item-label">优惠券</div>-->
 <!--          </div>-->
           <div class="count-list-item" @click="goPage('/wallet')">
-            <div class="count-list-item-value">9999</div>
-            <div class="count-list-item-label">余额</div>
+            <div class="count-list-item-value">0</div>
+            <div class="count-list-item-label">我的钱包余额</div>
           </div>
         </div>
       </div>
@@ -161,7 +161,7 @@ const couponCanUse = ref(undefined);
 // 常用功能
 const toolList = ref<Recordable[]>([
   { icon: 'balance-o', title: '我的钱包', path: '/wallet' },
-  { icon: 'point-gift-o', title: '积分兑换', path: '/integral/exchange' },
+  // { icon: 'point-gift-o', title: '积分兑换', path: '/integral/exchange' },
   // { icon: 'coupon-o', title: '优惠券', path: '/coupon' },
   { icon: 'location-o', title: '收货地址', path: '/address' },
   { icon: 'setting-o', title: '设置', path: '/setting' },

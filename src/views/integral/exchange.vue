@@ -61,13 +61,13 @@ function onSubmit() {
     <div class="header">
       <div class="header-count">
         <span class="header-count-value">{{ countPair(detail.score, 0) }}</span>
-        <span class="header-count-label">可用积分</span>
+        <span class="header-count-label">钱包剩余金额</span>
       </div>
     </div>
-    <van-field v-model="scoreNumber" type="digit" label="兑换现金" placeholder="你希望用多少积分来兑换余额" />
+    <van-field v-model="scoreNumber" type="digit" label="充值金额" placeholder="你希望充值的金额" />
     <div v-if="rule.desc" class="tips">规则：{{ rule.desc }}</div>
     <!-- 完成 -->
-    <AffixBarAction button-text="立即兑换" @submit="onSubmit" />
+    <AffixBarAction button-text="前往支付" @submit="onSubmit" />
   </div>
 </template>
 

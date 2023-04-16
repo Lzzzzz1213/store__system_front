@@ -76,18 +76,18 @@ function onGoodClicked(id: number) {
 <template>
   <!--轮播图-->
   <div class="container">
-    <div class="swiper">
-      <van-swipe :autoplay="5000" class="swiper">
-        <van-swipe-item
-          v-for="item in bannerList"
-          :key="item.id"
-          class="swiper-item"
-          @click="onBannerClicked(item.linkUrl)"
-        >
-          <van-image class="swiper-item-img" fit="cover" :src="item.img_path" :alt="item.title" />
-        </van-swipe-item>
-      </van-swipe>
-    </div>
+<!--    <div class="swiper">-->
+<!--      <van-swipe :autoplay="5000" class="swiper">-->
+<!--        <van-swipe-item-->
+<!--          v-for="item in bannerList"-->
+<!--          :key="item.id"-->
+<!--          class="swiper-item"-->
+<!--          @click="onBannerClicked(item.linkUrl)"-->
+<!--        >-->
+<!--          <van-image class="swiper-item-img" fit="cover" :src="item.img_path" :alt="item.title" />-->
+<!--        </van-swipe-item>-->
+<!--      </van-swipe>-->
+<!--    </div>-->
     <div class="main">
 
 

@@ -57,7 +57,7 @@ export const useUserStore = defineStore({
 
       if (this.getToken) {
         try {
-          await API_USER.userLoginOut();
+          // await API_USER.userLoginOut();
         } catch (error) {
           console.error('退出登录失败', error);
         }

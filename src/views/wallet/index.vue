@@ -8,10 +8,10 @@
           <div class="amount-item-label">可用余额</div>
           <div class="amount-item-value">{{ countPair(detail.balance) }}</div>
         </div>
-        <div class="amount-item">
-          <div class="amount-item-label">冻结余额</div>
-          <div class="amount-item-value">{{ countPair(detail.freeze) }}</div>
-        </div>
+<!--        <div class="amount-item">-->
+<!--          <div class="amount-item-label">冻结余额</div>-->
+<!--          <div class="amount-item-value">{{ countPair(detail.freeze) }}</div>-->
+<!--        </div>-->
         <div class="amount-item">
           <div class="amount-item-label">累计消费</div>
           <div class="amount-item-value">{{ countPair(detail.totleConsumed) }}</div>
@@ -23,6 +23,11 @@
         <van-icon name="cash-back-record" class="cell-icon" />
       </template>
     </van-cell>
+    <van-cell title="我要充值" class="cell" is-link @click="onWalletClicked">
+      <template #icon>
+        <van-icon name="cash-back-record" class="cell-icon" />
+      </template>
+    </van-cell>
   </div>
 </template>
 
@@ -30,7 +35,9 @@
 import API_USER from '@/apis/user';
 import { countPair } from '@/utils/format';
 
+
 export default {
+
   data() {
     return {
       detail: {},
@@ -43,6 +50,9 @@ export default {
     countPair,
     onCellClicked() {
       this.$router.push({ path: '/wallet/cashLog' });
+    },
+    onWalletClicked() {
+      this.$router.push({ path: '/integral/exchange' });
     },
     getDetail() {
       API_USER.userAmount().then((res) => {

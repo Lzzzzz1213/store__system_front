@@ -18,8 +18,8 @@ onMounted(() => {
     getAddressInfo();
   }
 
-  getUserAmount();
-  getOrderSetInfo();
+  // getUserAmount();
+  // getOrderSetInfo();
 });
 
 const router = useRouter();
