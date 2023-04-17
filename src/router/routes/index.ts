@@ -170,7 +170,7 @@ const routes = [
   {
     path: '/wallet/cashLog',
     name: 'walletCashLog',
-    component: () => import('@/views/wallet/cashLog.vue'),
+    component: () => import('@/views/wallet/rechargeLog.vue'),
     meta: {
       title: '资金记录',
       needLogin: true,
