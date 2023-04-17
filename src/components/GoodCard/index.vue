@@ -24,7 +24,7 @@ export default defineComponent({
 
 <template>
   <div class="good-card">
-    <van-image fit="contain" class="good-card-pic" :src="`http://127.0.0.1:9000/demo/api/img/media/${good.commodity__img__path}`" />
+    <van-image fit="contain" class="good-card-pic" :src="`http://192.168.46.108:9000/demo/api/img/media/${good.commodity__img__path}`" />
     <div class="good-card-content">
       <div class="good-card-title">{{ good.commodity__name }}</div>
       <div class="good-card-desc">

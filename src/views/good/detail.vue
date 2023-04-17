@@ -163,7 +163,7 @@ const afterSaleTitle = ref('');
 
 <template>
   <div class="container">
-    <van-image class="swiper-item-img" fit="contain" :src="`http://127.0.0.1:9000/demo/api/img/media/${commodityInfo.pic.path}`" alt="">
+    <van-image class="swiper-item-img" fit="contain" :src="`http://192.168.46.108:9000/demo/api/img/media/${commodityInfo.pic.path}`" alt="">
       <template v-slot:loading>
         <van-loading type="spinner" size="20" />
       </template>
@@ -204,7 +204,7 @@ const afterSaleTitle = ref('');
     </van-cell>
     <Plate title="商品详情" class="mt10" />
     <div class="goods-content" v-html="content"></div>
-    <van-image class="swiper-item-img" fit="contain" :src="`http://127.0.0.1:9000/demo/api/img/media/${commodityDetail.pic.path}`" alt="">
+    <van-image class="swiper-item-img" fit="contain" :src="`http://192.168.46.108:9000/demo/api/img/media/${commodityDetail.pic.path}`" alt="">
       <template v-slot:loading>
         <van-loading type="spinner" size="20" />
       </template>

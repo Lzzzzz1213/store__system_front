@@ -200,7 +200,7 @@ function onSubmit() {
               <div class="list-item-selected">
                 <van-checkbox v-model="item.selected"></van-checkbox>
               </div>
-              <van-image fit="contain" class="list-item-pic" :src="`http://127.0.0.1:9000/demo/api/img/media/${item.commodity__img__path}`" />
+              <van-image fit="contain" class="list-item-pic" :src="`http://192.168.46.108:9000/demo/api/img/media/${item.commodity__img__path}`" />
               <div class="list-item-content">
                 <div class="list-item-title">
                   {{ item.commodity__name }}

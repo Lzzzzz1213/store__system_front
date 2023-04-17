@@ -53,11 +53,19 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       proxy: {
         /** 基础服务 */
         "/demo/api": {
-          target: "http://127.0.0.1:9000/demo/api",
+          target: "http://192.168.46.108:9000/demo/api",
           ws: true,
           /** 是否允许跨域 */
           changeOrigin: true,
           rewrite: (path) => path.replace("/demo/api", "")
+        },
+        /** 基础服务 */
+        "/pay": {
+          target: "http://127.0.0.1:8080/pay",
+          ws: true,
+          /** 是否允许跨域 */
+          changeOrigin: true,
+          // rewrite: (path) => path.replace("/demo/api", "")
         },
       }
     },
