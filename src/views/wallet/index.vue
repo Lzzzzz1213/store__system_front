@@ -18,7 +18,12 @@
         </div>
       </div>
     </div>
-    <van-cell title="资金记录" class="cell" is-link @click="onCellClicked">
+    <van-cell title="充值记录" class="cell" is-link @click="onCellClicked">
+      <template #icon>
+        <van-icon name="cash-back-record" class="cell-icon" />
+      </template>
+    </van-cell>
+    <van-cell title="消费记录" class="cell" is-link @click="onCellClicked">
       <template #icon>
         <van-icon name="cash-back-record" class="cell-icon" />
       </template>

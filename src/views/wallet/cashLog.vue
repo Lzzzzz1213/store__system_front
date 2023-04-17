@@ -10,14 +10,16 @@
       :immediate-check="false"
       @load="onPageLoad"
     >
+<!--      <div>我的充值记录</div>-->
       <div v-for="item in list" :key="item.id" class="list-item van-hairline--bottom">
         <div class="list-item-hd">
-          <div class="list-item-title">{{ item.typeStr }}</div>
-          <div class="list-item-txt">{{ item.dateAdd }}</div>
+          <div class="list-item-title">订单</div>
+          <div class="list-item-txt">流水号:{{ item.trade_no}}</div>
+          <div class="list-item-txt">充值金额:{{ item.in_history }}</div>
+          <div class="list-item-txt">充值时间:{{ moment(item.created_time).format('YYYY-MM-DD HH:mm:ss') }}</div>
         </div>
-        <div :class="['list-item-bd', item.behavior ? 'c-red' : 'c-green']">
-          <span>{{ item.behavior ? '-' : '+' }}</span>
-          <span>{{ countPair(item.amount) }}</span>
+        <div class="list-item-bd c-green">
+          <span>完成</span>
         </div>
       </div>
       <template #finished>
@@ -32,6 +34,8 @@
 import API_USER from '@/apis/user';
 import { countPair } from '@/utils/format';
 import IMAGE_EMPTY_TRADE from '@/assets/images/empty/trade.png';
+import {useUserStore} from "@/store/modules/user";
+import moment from 'moment'
 
 export default {
   data() {
@@ -52,6 +56,7 @@ export default {
     this.onPage();
   },
   methods: {
+    moment,
     countPair,
     onPageLoad() {
       if (this.listFinished) {
@@ -67,21 +72,33 @@ export default {
         page: this.pageCurrent,
         pageSize: this.pageSize,
       };
-
-      API_USER.userCashLog(params)
-        .then((res) => {
-          const records = res.data?.result ?? [];
-          const total = res.data?.totalRow ?? 0;
-
-          this.list = this.pageCurrent === 1 ? records : this.list.concat(records);
-          this.listLoading = false;
-          this.listFinished = this.list.length >= total;
-        })
-        .catch((error) => {
-          console.error(error);
-          this.listLoading = false;
-          this.listError = true;
-        });
+        API_USER.myWalletRechargeApi(useUserStore().userInfo.id, params)
+          .then((res) => {
+            const total = res.total ?? 0
+            const records = res.data ?? []
+            this.list = this.pageCurrent === 1 ? records : this.list.concat(records)
+            this.listLoading = false
+            this.listFinished = this.list.length >= total
+          })
+          .catch((error) => {
+            console.log(error)
+            this.listLoading = false
+            this.listError = true
+          })
+      // API_USER.userCashLog(params)
+      //   .then((res) => {
+      //     const records = res.data?.result ?? [];
+      //     const total = res.data?.totalRow ?? 0;
+      //
+      //     this.list = this.pageCurrent === 1 ? records : this.list.concat(records);
+      //     this.listLoading = false;
+      //     this.listFinished = this.list.length >= total;
+      //   })
+      //   .catch((error) => {
+      //     console.error(error);
+      //     this.listLoading = false;
+      //     this.listError = true;
+      //   });
     },
   },
 };
