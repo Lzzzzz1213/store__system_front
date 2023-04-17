@@ -5,6 +5,8 @@ export interface HttpResult<T = any> {
 }
 
 export interface ServiceResult<T = any> {
+  sum: number;
+  balance: number;
   total: any;
   detail: string;
   code: number;

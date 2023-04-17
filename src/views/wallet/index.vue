@@ -14,7 +14,7 @@
 <!--        </div>-->
         <div class="amount-item">
           <div class="amount-item-label">累计消费</div>
-          <div class="amount-item-value">{{ countPair(detail.totleConsumed) }}</div>
+          <div class="amount-item-value">{{ countPair(sum) }}</div>
         </div>
       </div>
     </div>
@@ -34,6 +34,7 @@
 <script>
 import API_USER from '@/apis/user';
 import { countPair } from '@/utils/format';
+import {useUserStore} from "@/store/modules/user";
 
 
 export default {
@@ -41,6 +42,7 @@ export default {
   data() {
     return {
       detail: {},
+      sum: 0
     };
   },
   created() {
@@ -55,9 +57,12 @@ export default {
       this.$router.push({ path: '/integral/exchange' });
     },
     getDetail() {
-      API_USER.userAmount().then((res) => {
-        this.detail = res.data || {};
+      API_USER.myWalletApi(useUserStore().userInfo.id).then((res) => {
+        this.detail = res || {};
       });
+      API_USER.myWalletCountApi(useUserStore().userInfo.id).then((res) => {
+        this.sum = res.sum || 0
+      })
     },
   },
 };

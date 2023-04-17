@@ -204,6 +204,20 @@ export function loginApi(data: ILoginData) {
   })
 }
 
+export function myWalletApi(id: any){
+  return request({
+    url: `/wallet/detail/${id}/`,
+    method: "get"
+  })
+}
+
+export function myWalletCountApi(id: any){
+  return request({
+    url: `/wallet/count/${id}`,
+    method: "get"
+  })
+}
+
 export default {
   loginApi,
   userAmount,
@@ -225,4 +239,7 @@ export default {
   userShoppingAddressDetail,
   userShoppingAddressList,
   userShoppingAddressUpdate,
+  // 我的钱包
+  myWalletApi,
+  myWalletCountApi
 };

@@ -44,7 +44,7 @@
 <!--            <div class="count-list-item-label">优惠券</div>-->
 <!--          </div>-->
           <div class="count-list-item" @click="goPage('/wallet')">
-            <div class="count-list-item-value">0</div>
+            <div class="count-list-item-value">{{ balance }}</div>
             <div class="count-list-item-label">我的钱包余额</div>
           </div>
         </div>
@@ -102,7 +102,7 @@ import { usePage } from '@/hooks/shared/usePage';
 onMounted(() => {
   if (unref(hasLogin)) {
     // userStore.getUserDetail();
-    // getCounts();
+    getCounts();
   }
 });
 
@@ -111,7 +111,7 @@ const { hasLogin, goLogin, goPage } = usePage();
 
 // 统计
 const growth = ref(0); // 成长值
-const balance = ref(undefined);
+const balance = ref<number>(0);
 const score = ref(undefined);
 const couponCanUse = ref(undefined);
 
@@ -177,23 +177,26 @@ function onEasterEgg() {
 }
 
 function getCounts() {
-  API_USER.userAmount().then((res) => {
-    balance.value = res.data?.balance ?? 0;
-    growth.value = res.data?.growth ?? 0;
-    score.value = res.data?.score ?? 0;
-  });
+  // API_USER.userAmount().then((res) => {
+  //   balance.value = res.data?.balance ?? 0;
+  //   growth.value = res.data?.growth ?? 0;
+  //   score.value = res.data?.score ?? 0;
+  // });
+  API_USER.myWalletApi(useUserStore().userInfo.id).then((res) => {
+    balance.value = res.balance ?? 0
+  })
 
-  API_ORDER.orderStatistics().then((res) => {
-    const orderCount = res.data;
+  // API_ORDER.orderStatistics().then((res) => {
+  //   const orderCount = res.data;
+  //
+  //   orderList.value.forEach((item) => {
+  //     orderCount[item.countKey] && (item.count = orderCount[item.countKey]);
+  //   });
+  // });
 
-    orderList.value.forEach((item) => {
-      orderCount[item.countKey] && (item.count = orderCount[item.countKey]);
-    });
-  });
-
-  API_DISCOUNTS.discountsStatistics().then((res) => {
-    couponCanUse.value = res.data?.canUse ?? 0;
-  });
+  // API_DISCOUNTS.discountsStatistics().then((res) => {
+  //   couponCanUse.value = res.data?.canUse ?? 0;
+  // });
 }
 </script>
 <style lang="less" scoped>
