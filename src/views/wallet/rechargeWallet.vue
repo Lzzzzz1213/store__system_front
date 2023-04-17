@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref, unref } from 'vue';
+import {onMounted, reactive, ref, unref} from 'vue';
 import { Toast } from 'vant';
 import API_USER from '@/apis/user';
 import API_SCORE from '@/apis/score';
@@ -13,10 +13,14 @@ onMounted(() => {
 });
 
 const type = ref(2);
-const scoreNumber = ref('');
+const scoreNumber = ref(0);
 const detail = ref<Recordable>({});
 const rule = ref<Recordable>({});
 const balance = ref<number>(0)
+const params = reactive({
+  amount: 0,
+  customer_id: 0
+})
 function getDetail() {
   API_USER.myWalletApi(useUserStore().userInfo.id).then((res) => {
     balance.value = res.balance ?? 0
@@ -33,15 +37,12 @@ function getDetail() {
 }
 
 function onSubmit() {
-  if (unref(type) === 2 && !unref(scoreNumber)) {
-    Toast('请输入积分');
+  if (!unref(scoreNumber)) {
+    Toast('请输入充值金额');
     return;
   }
-
-  const params = {
-    type: unref(type),
-    deductionScore: unref(scoreNumber),
-  };
+  params.amount = unref(scoreNumber)
+  params.customer_id = useUserStore().userInfo.id as number
 
   Toast.loading({
     forbidClick: true,
@@ -49,14 +50,21 @@ function onSubmit() {
     duration: 0,
   });
 
-  API_SCORE.scoreExchangeCash(params)
-    .then(() => {
-      Toast('兑换成功');
-      getDetail();
-    })
+  API_USER.walletPaymentApi(params).then((res) => {
+    console.log(res)
+    window.location.href = res.request.responseURL
+  })
     .catch((error) => {
-      console.error(error);
-    });
+      console.log(error)
+    })
+  // API_SCORE.scoreExchangeCash(params)
+  //   .then(() => {
+  //     Toast('兑换成功');
+  //     getDetail();
+  //   })
+  //   .catch((error) => {
+  //     console.error(error);
+  //   });
 }
 </script>
 

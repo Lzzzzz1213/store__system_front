@@ -85,7 +85,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, onMounted, ref, unref } from 'vue';
+import { computed, onMounted, ref, unref, reactive } from 'vue';
 import API_USER from '@/apis/user';
 import API_DISCOUNTS from '@/apis/discounts';
 import API_ORDER from '@/apis/order';
@@ -114,7 +114,6 @@ const growth = ref(0); // 成长值
 const balance = ref<number>(0);
 const score = ref(undefined);
 const couponCanUse = ref(undefined);
-
 // 我的订单
 // const orderList = ref<Recordable[]>([
 //   {
@@ -182,10 +181,6 @@ function getCounts() {
   //   growth.value = res.data?.growth ?? 0;
   //   score.value = res.data?.score ?? 0;
   // });
-  API_USER.walletPaymentApi().then((res) => {
-    console.log('1')
-    console.log(res)
-  })
   API_USER.myWalletApi(useUserStore().userInfo.id).then((res) => {
     balance.value = res.balance ?? 0
   })
