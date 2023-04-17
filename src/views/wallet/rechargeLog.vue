@@ -69,8 +69,8 @@ export default {
       this.listLoading = true;
 
       const params = {
-        page: this.pageCurrent,
-        pageSize: this.pageSize,
+        currentPage: this.pageCurrent,
+        size: this.pageSize,
       };
         API_USER.myWalletRechargeApi(useUserStore().userInfo.id, params)
           .then((res) => {
