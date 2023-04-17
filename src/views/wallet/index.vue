@@ -18,12 +18,12 @@
         </div>
       </div>
     </div>
-    <van-cell title="充值记录" class="cell" is-link @click="onCellClicked">
+    <van-cell title="充值记录" class="cell" is-link @click="onRechargeClicked">
       <template #icon>
         <van-icon name="cash-back-record" class="cell-icon" />
       </template>
     </van-cell>
-    <van-cell title="消费记录" class="cell" is-link @click="onCellClicked">
+    <van-cell title="消费记录" class="cell" is-link @click="onConsumeClicked">
       <template #icon>
         <van-icon name="cash-back-record" class="cell-icon" />
       </template>
@@ -55,11 +55,14 @@ export default {
   },
   methods: {
     countPair,
-    onCellClicked() {
-      this.$router.push({ path: '/wallet/cashLog' });
+    onConsumeClicked() {
+      this.$router.push({ path: '/wallet/consumeLog' });
+    },
+    onRechargeClicked() {
+      this.$router.push({ path: '/wallet/rechargeLog' });
     },
     onWalletClicked() {
-      this.$router.push({ path: '/integral/exchange' });
+      this.$router.push({ path: '/wallet/rechargeWallet' });
     },
     getDetail() {
       API_USER.myWalletApi(useUserStore().userInfo.id).then((res) => {

@@ -226,6 +226,14 @@ export function myWalletRechargeApi(id: any, params) {
   })
 }
 
+export function myWalletConsumeApi(id: any, params) {
+  return request({
+    url: `/wallet/consume/${id}/`,
+    method: "get",
+    params
+  })
+}
+
 export default {
   loginApi,
   userAmount,
@@ -250,5 +258,6 @@ export default {
   // 我的钱包
   myWalletApi,
   myWalletCountApi,
-  myWalletRechargeApi
+  myWalletRechargeApi,
+  myWalletConsumeApi
 };

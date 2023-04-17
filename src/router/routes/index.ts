@@ -150,11 +150,11 @@ const routes = [
     },
   },
   {
-    path: '/integral/exchange',
-    name: 'integralExchange',
-    component: () => import('@/views/integral/exchange.vue'),
+    path: '/wallet/rechargeWallet',
+    name: 'rechargeWallet',
+    component: () => import('@/views/wallet/rechargeWallet.vue'),
     meta: {
-      title: '积分兑换',
+      title: '钱包充值',
       needLogin: true,
     },
   },
@@ -168,11 +168,20 @@ const routes = [
     },
   },
   {
-    path: '/wallet/cashLog',
-    name: 'walletCashLog',
+    path: '/wallet/rechargeLog',
+    name: 'walletRechargeLog',
     component: () => import('@/views/wallet/rechargeLog.vue'),
     meta: {
-      title: '资金记录',
+      title: '充值记录',
+      needLogin: true,
+    },
+  },
+  {
+    path: '/wallet/consumeLog',
+    name: 'walletConsumeLog',
+    component: () => import('@/views/wallet/consumeLog.vue'),
+    meta: {
+      title: '消费记录',
       needLogin: true,
     },
   },
