@@ -234,6 +234,17 @@ export function myWalletConsumeApi(id: any, params) {
   })
 }
 
+import axios from "axios";
+const request2 = axios.create({
+  baseURL:'http://127.0.0.1:8080/pay'
+})
+export function walletPaymentApi(){
+  return request2({
+    url: '/demo',
+    method: "get"
+  })
+}
+
 export default {
   loginApi,
   userAmount,
@@ -259,5 +270,6 @@ export default {
   myWalletApi,
   myWalletCountApi,
   myWalletRechargeApi,
-  myWalletConsumeApi
+  myWalletConsumeApi,
+  walletPaymentApi
 };
