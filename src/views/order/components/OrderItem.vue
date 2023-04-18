@@ -97,7 +97,7 @@ function onOrderDelete(item: Recordable, index: number) {
       </template>
       <template v-if="Number(item.status) === 0">
         <van-button class="list-item-action-btn" round plain @click.stop="onOrderCancel(item)"> 取消订单 </van-button>
-        <van-button class="list-item-action-btn" round plain type="primary" @click.stop="onOrderClicked(item)">
+        <van-button class="list-item-action-btn" round plain type="primary" @click.stop="onOrderClicked(item.id)">
           去支付
         </van-button>
       </template>

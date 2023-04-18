@@ -5,6 +5,7 @@ import { Dialog, Toast } from 'vant';
 import dayjs from 'dayjs';
 import API_ORDER from '@/apis/order';
 import API_USER from '@/apis/user';
+import API_WALLET from '@/apis/wallet';
 import { setClipboardData } from '@/utils/helpers/clipboard';
 import Price from '@/components/Price/index.vue';
 import OrderSteps from './components/OrderSteps.vue';
@@ -12,6 +13,7 @@ import OrderRate from './components/OrderRate.vue';
 import { decimalFormat } from '@/utils/format';
 
 import { useOrderStore } from '@/store/modules/order';
+import { useUserStore} from '@/store/modules/user'
 
 onMounted(() => {
   getDetail();
@@ -101,8 +103,19 @@ function onOrderDelete(orderId: number) {
     });
 }
 
-function onOrderPay(_orderId: number) {
-  Toast({ message: '未开放：收银台', duration: 1500 });
+function onOrderPay(order_id: any, customer_id: any) {
+  Toast({ message: '支付中请稍等', duration: 2500 });
+  const  params  = { order_id, customer_id}
+  setTimeout(() => {
+    API_WALLET.walletPayment(params)
+      .then((res) => {
+        Toast({ message: res.msg, duration: 1500 });
+      })
+      .catch((error) => {
+        Toast({ message: error.msg, duration: 1500 });
+      })
+  }, 3000)
+
 }
 
 function onConcatService(_orderId: number) {
@@ -310,36 +323,36 @@ function getDetail() {
       </div>
 
       <!-- 底部操作栏 -->
-      <div class="action-bar-wrap">
+      <div class="action-bar-wrap" style="font-size: 10px;">
         <div class="action-bar">
           <!-- ▼ 操作按钮组（一行最好不要超过3个） -->
-          <template v-if="orderInfo.status === -1 || orderInfo.status === 3 || orderInfo.status === 4">
-            <van-button class="action-bar-btn" round @click.stop="onOrderDelete(orderInfo.id)"> 删除订单 </van-button>
-          </template>
-          <template v-if="orderInfo.status === 0">
+<!--          <template v-if="order.status === '0' || order.status === '3'">-->
+<!--            <van-button class="action-bar-btn" round @click.stop="onOrderDelete(order.id)"> 删除订单 </van-button>-->
+<!--          </template>-->
+          <template v-if="order.status === '0'">
             <div class="action-bar-hd">
               <span class="action-bar-total">合计：</span>
               <div class="action-bar-price">
                 <span class="action-bar-price-symbol">¥</span>
-                <span class="action-bar-price-integer">{{ decimalFormat(orderInfo.amountReal) }}</span>
+                <span class="action-bar-price-integer">{{ decimalFormat(order.payment_amount) }}</span>
               </div>
             </div>
-            <van-button class="action-bar-btn" round plain @click.stop="onOrderCancel(orderInfo.id)">
+            <van-button class="action-bar-btn" round plain @click.stop="onOrderCancel(order.id)">
               取消订单
             </van-button>
-            <van-button class="action-bar-btn" round type="primary" @click.stop="onOrderPay(orderInfo.id)">
+            <van-button class="action-bar-btn" round type="primary" @click.stop="onOrderPay(order.id, useUserStore().userInfo.id)">
               去支付
             </van-button>
           </template>
-          <template v-if="orderInfo.status === 1">
-            <van-button icon="service" class="action-bar-btn" round @click.stop="onConcatService(orderInfo.id)">
-              联系客服
-            </van-button>
-          </template>
-          <template v-if="orderInfo.status === 2">
+<!--          <template v-if="orderInfo.status === 1">-->
+<!--            <van-button icon="service" class="action-bar-btn" round @click.stop="onConcatService(orderInfo.id)">-->
+<!--              联系客服-->
+<!--            </van-button>-->
+<!--          </template>-->
+          <template v-if="order.status === '2'">
             <van-button class="action-bar-btn" round @click.stop="onOrderDelivery(orderInfo.id)">确认收货</van-button>
           </template>
-          <template v-if="orderInfo.status === 3">
+          <template v-if="order.status === '3'">
             <van-button class="action-bar-btn" round @click.stop="onOrderReputation">评价</van-button>
           </template>
           <!-- ▲ 操作按钮组 -->
