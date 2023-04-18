@@ -15,12 +15,13 @@ const emit = defineEmits(['delete']);
 const router = useRouter();
 const orderStore = useOrderStore();
 const server = import.meta.env.VITE_APP_SERVER_IP
-function onOrderClicked(item: Recordable) {
-  const { orderNumber } = item;
+function onOrderClicked(id: any) {
+  console.log(id)
+  // const { orderNumber } = item;
   router.push({
     path: '/order/detail',
     query: {
-      orderNumber,
+      id: id,
     },
   });
 }
@@ -66,7 +67,7 @@ function onOrderDelete(item: Recordable, index: number) {
       </div>
 
     </div>
-    <div class="list-item-body" @click="onOrderClicked(item)">
+    <div class="list-item-body" @click="onOrderClicked(item.id)">
       <div  class="good-card">
         <van-image fit="contain" class="good-card-pic" :src="`http://${server}/demo/api/img/media/${JSON.parse(item.details)[0].commodity_path}`" />
         <div class="good-card-content">
@@ -80,7 +81,7 @@ function onOrderDelete(item: Recordable, index: number) {
           </div>
         </div>
       </div>
-      <div v-if="JSON.parse(item.details).length > 1" class="list-item-more">查看全部{{ item.goodsNumber }}件商品</div>
+      <div v-if="JSON.parse(item.details).length > 1" class="list-item-more">查看全部{{ JSON.parse(item.details).length }}件商品</div>
       <div class="list-item-total van-hairline--top">
         <span class="list-item-total-number">共{{ JSON.parse(item.details).length }}种商品</span>
         <div class="list-item-total-price">

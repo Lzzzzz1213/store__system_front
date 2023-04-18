@@ -59,13 +59,13 @@ export function orderDelivery(data?: Recordable) {
 /**
  * 订单详情
  */
-export function orderDetail(data?: Recordable) {
-  return request({
-    url: `/order/detail`,
-    method: 'get',
-    params: data,
-  });
-}
+// export function orderDetail(data?: Recordable) {
+//   return request({
+//     url: `/order/detail`,
+//     method: 'get',
+//     params: data,
+//   });
+// }
 
 /**
  * 订单列表
@@ -176,6 +176,13 @@ export function orderStatistics(data?: Recordable) {
     method: 'get',
     params: data,
   });
+}
+
+export function orderDetail(id: any){
+  return request({
+    url: `/order/detail/${id}`,
+    method: 'get',
+  })
 }
 
 export default {

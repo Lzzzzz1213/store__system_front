@@ -167,13 +167,13 @@ export function userShoppingAddressDelete(data?: Recordable) {
 /**
  * 收货地址详情
  */
-export function userShoppingAddressDetail(data?: Recordable) {
-  return request({
-    url: `/user/shipping-address/detail/v2`,
-    method: 'get',
-    params: data,
-  });
-}
+// export function userShoppingAddressDetail(data?: Recordable) {
+//   return request({
+//     url: `/user/shipping-address/detail/v2`,
+//     method: 'get',
+//     params: data,
+//   });
+// }
 
 /**
  * 收货地址列表
@@ -194,6 +194,13 @@ export function userShoppingAddressUpdate(data?: Recordable) {
     method: 'post',
     data,
   });
+}
+
+export function userShoppingAddressDetail(id: any){
+  return request({
+    url: `/address/detail/${id}/`,
+    method: 'get',
+  })
 }
 
 export function loginApi(data: ILoginData) {
@@ -233,6 +240,8 @@ export function myWalletConsumeApi(id: any, params) {
     params
   })
 }
+
+
 
 import axios from "axios";
 const requestForPayment = axios.create({

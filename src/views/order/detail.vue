@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { Dialog, Toast } from 'vant';
 import dayjs from 'dayjs';
 import API_ORDER from '@/apis/order';
+import API_USER from '@/apis/user';
 import { setClipboardData } from '@/utils/helpers/clipboard';
 import Price from '@/components/Price/index.vue';
 import OrderSteps from './components/OrderSteps.vue';
@@ -15,14 +16,45 @@ import { useOrderStore } from '@/store/modules/order';
 onMounted(() => {
   getDetail();
 });
-
+const server = import.meta.env.VITE_APP_SERVER_IP
 const router = useRouter();
 const route = useRoute();
 const orderStore = useOrderStore();
 
 const isLoading = ref(false);
 const orderInfo = ref<Recordable>({});
-const goods = ref<Recordable[]>([]);
+// const goods = ref<Recordable[]>([]);
+const goods = ref<any>();
+const order = ref({
+  id: 0,
+  details: [],
+  remark: "",
+  updated_time: "",
+  created_time: "",
+  order_no: "",
+  order_amount: "",
+  payment_amount: "",
+  status: "",
+  shipping_address: 0,
+  customer: 0
+})
+const address =  ref({
+  id: 3,
+  isDefault: false,
+  updated_time: "2023-03-19T15:33:27.018748",
+  created_time: "2023-03-19T15:33:27.018748",
+  address: "算得上是所",
+  cityId: "500100",
+  cityStr: "重庆市",
+  areaStr: "江津区",
+  districtId: "500116",
+  linkMan: "李可",
+  mobile: "13609097970",
+  provinceId: "500000",
+  provinceStr: "重庆市",
+  customer: 3
+});
+
 const logistics = ref<Recordable>({});
 const logList = ref<Recordable[]>([]);
 
@@ -122,19 +154,25 @@ function onRefresh() {
 }
 
 function getDetail() {
-  API_ORDER.orderDetail({ orderNumber: route.query.orderNumber })
+  API_ORDER.orderDetail( route.query.id )
     .then((res) => {
-      orderInfo.value = res.data.orderInfo;
-      goods.value = res.data.goods;
-      logList.value = res.data.logs;
-      logistics.value = res.data?.logistics ?? {};
+      goods.value = JSON.parse(res.data.details)
+      order.value = res.data
+      API_USER.userShoppingAddressDetail(res.data.shipping_address).then((res) => {
+        address.value = res.data
+      })
 
-      // 待支付的订单
-      if (unref(orderInfo).status === 0 && unref(orderInfo).dateClose) {
-        const end = dayjs(unref(orderInfo).dateClose);
-        const now = dayjs();
-        closeTime.value = end.diff(now);
-      }
+      // orderInfo.value = res.data.orderInfo;
+      // goods.value = res.data.goods;
+      // logList.value = res.data.logs;
+      // logistics.value = res.data?.logistics ?? {};
+      //
+      // // 待支付的订单
+      // if (unref(orderInfo).status === 0 && unref(orderInfo).dateClose) {
+      //   const end = dayjs(unref(orderInfo).dateClose);
+      //   const now = dayjs();
+      //   closeTime.value = end.diff(now);
+      // }
     })
     .finally(() => {
       isLoading.value = false;
@@ -159,21 +197,21 @@ function getDetail() {
             </div>
           </template>
         </div>
-        <div class="order-step" @click="onStepsOpen">
-          <span class="order-step-label">订单跟踪</span>
+        <div class="order-step">
+          <span class="order-step-label">订单详情</span>
           <van-icon class="order-step-icon" name="arrow" />
         </div>
         <OrderSteps v-model:show="stepsPopupShow" :list="logList" />
       </div>
-      <template v-if="orderInfo.isNeedLogistics">
+      <template v-if="order.shipping_address">
         <div class="address van-hairline--top">
           <div class="address-hd">
             <div class="address-inner">
               <van-icon name="location-o" class="address-inner-icon" />
-              <div class="address-inner-title">收货人：{{ logistics.linkMan }}</div>
-              <div class="address-inner-title">{{ logistics.mobile }}</div>
+              <div class="address-inner-title">收货人：{{ address.linkMan }}</div>
+              <div class="address-inner-title">{{ address.mobile }}</div>
             </div>
-            <div class="address-inner-bottom">收货地址：{{ logistics.address }}</div>
+            <div class="address-inner-bottom">收货地址：{{address.provinceStr+address.cityStr+address.areaStr+address.address }}</div>
           </div>
         </div>
         <van-cell title="物流信息" class="cell">
@@ -191,18 +229,18 @@ function getDetail() {
         </div>
         <div class="list">
           <div v-for="(item, index) in goods" :key="index" class="list-item" @click="onGoodClicked(item.goodsId)">
-            <van-image fit="contain" class="list-item-pic" :src="item.pic" />
+            <van-image fit="contain" class="list-item-pic" :src="`http://${server}/demo/api/img/media/${item.commodity_path}`" />
             <div class="list-item-content">
-              <div class="list-item-title">{{ item.goodsName }}</div>
+              <div class="list-item-title">{{ item.commodity_name }}</div>
               <div class="list-item-desc">
-                <div v-if="item.property" class="list-item-prop">
-                  {{ item.property }}
+                <div v-if="item.commodity_name" class="list-item-prop">
+                  {{ item.commodity_name }}
                 </div>
               </div>
               <div class="list-item-bottom">
                 <div class="list-item-price text-brand-color">
                   <span class="list-item-price-symbol">¥</span>
-                  <span class="list-item-price-integer">{{ decimalFormat(item.amountSingle) }}</span>
+                  <span class="list-item-price-integer">{{ decimalFormat(item.price) }}</span>
                 </div>
                 <div class="list-item-number">x{{ item.number }}</div>
               </div>
@@ -213,27 +251,27 @@ function getDetail() {
           <span class="subtotal-label">商品小计：</span>
           <span class="subtotal-price">
             <span class="subtotal-price-symbol">¥</span>
-            <span class="subtotal-price-integer">{{ decimalFormat(orderInfo.amount) }}</span>
+            <span class="subtotal-price-integer">{{ decimalFormat(order.order_amount) }}</span>
           </span>
         </div>
       </div>
       <!-- 备注 -->
       <div class="section">
-        <van-cell title="买家留言" class="cell" :value="orderInfo.remark || '无'" />
+        <van-cell title="买家留言" class="cell" :value="order.remark || '无'" />
       </div>
       <!-- 金额统计信息 -->
       <div class="section">
         <div class="amount">
           <div class="amount-hd">商品金额</div>
-          <div class="amount-bd">¥ {{ decimalFormat(orderInfo.amount) }}</div>
+          <div class="amount-bd">¥ {{ decimalFormat(order.order_amount) }}</div>
         </div>
-        <div v-if="orderInfo.isNeedLogistics" class="amount">
+        <div class="amount">
           <div class="amount-hd">运费</div>
-          <div class="amount-bd">+ {{ decimalFormat(orderInfo.amountLogistics) }}</div>
+          <div class="amount-bd">+ {{ decimalFormat(0) }}</div>
         </div>
         <div class="amount amount-total-price">
-          <span class="amount-total-price-label">{{ orderInfo.status === 0 ? '需付款：' : '实付款：' }}</span>
-          <Price class="amount-total-price-price" :price="orderInfo.amountReal" />
+          <span class="amount-total-price-label">{{ order.status === 0 ? '需付款：' : '实付款：' }}</span>
+          <Price class="amount-total-price-price" :price="order.payment_amount" />
         </div>
       </div>
       <!-- 订单信息 -->
@@ -241,7 +279,7 @@ function getDetail() {
         <div class="order-no">
           <div class="order-no-p">
             订单编号：
-            <span class="order-no-p-value">{{ orderInfo.orderNumber }}</span>
+            <span class="order-no-p-value">{{ order.order_no }}</span>
             <van-button
               class="order-no-copy-btn"
               plain
@@ -254,7 +292,7 @@ function getDetail() {
           </div>
           <div class="order-no-p">
             下单时间：
-            <span class="order-no-p-value"> {{ orderInfo.dateAdd }}</span>
+            <span class="order-no-p-value"> {{ order.created_time }}</span>
           </div>
           <div class="order-no-p">
             支付方式：
@@ -264,7 +302,7 @@ function getDetail() {
             付款方式：
             <span class="order-no-p-value">钱包余额</span>
           </div>
-          <div v-if="orderInfo.isNeedLogistics" class="order-no-p">
+          <div class="order-no-p">
             配送方式：
             <span class="order-no-p-value"> 普通快递</span>
           </div>
