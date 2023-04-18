@@ -7,7 +7,8 @@
     "pnpm": ">= 6"
   },
   "scripts": {
-    "dev": "vite",
+    "serve:dev": "vite --mode dev",
+    "serve:prod": "vite --mode pro",
     "build": "vite build",
     "build:test": "vite build --mode test",
     "preview": "vite preview",

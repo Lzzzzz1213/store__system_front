@@ -14,7 +14,7 @@ defineProps({
 const emit = defineEmits(['delete']);
 const router = useRouter();
 const orderStore = useOrderStore();
-
+const server = import.meta.env.VITE_APP_SERVER_IP
 function onOrderClicked(item: Recordable) {
   const { orderNumber } = item;
   router.push({
@@ -68,7 +68,7 @@ function onOrderDelete(item: Recordable, index: number) {
     </div>
     <div class="list-item-body" @click="onOrderClicked(item)">
       <div  class="good-card">
-        <van-image fit="contain" class="good-card-pic" :src="`http://192.168.46.108:9000/demo/api/img/media/${JSON.parse(item.details)[0].commodity_path}`" />
+        <van-image fit="contain" class="good-card-pic" :src="`http://${server}/demo/api/img/media/${JSON.parse(item.details)[0].commodity_path}`" />
         <div class="good-card-content">
           <div class="good-card-content-hd">
             <div class="good-card-title">{{ JSON.parse(item.details)[0].commodity_name }}</div>

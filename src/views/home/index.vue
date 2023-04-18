@@ -11,6 +11,7 @@ onMounted(() => {
   // getBannerList();
   onPage();
 });
+const server = import.meta.env.VITE_APP_SERVER_IP
 
 const router = useRouter();
 
@@ -105,7 +106,7 @@ function onGoodClicked(id: number) {
         <div v-for="item in list" :key="item.id" class="list-col">
           <div class="list-item" @click="onGoodClicked(item.id)">
             <div v-if="item.recommendStatus" class="list-item-badge">推荐</div>
-            <van-image class="list-item-photo" :src="`http://192.168.46.108:9000/demo/api/img/media/${item.img_path}`" :alt="item.name" />
+            <van-image class="list-item-photo" :src="`http://${server}/demo/api/img/media/${item.img_path}`" :alt="item.name" />
             <div class="list-item-info">
               <div class="list-item-title">{{ item.name }}</div>
               <div class="list-item-price">

@@ -11,12 +11,14 @@ export default defineComponent({
     },
   },
   setup() {
+    const server = import.meta.env.VITE_APP_SERVER_IP
     function propTitle(list: Recordable[]) {
       return list.map((v) => v.childName).join(',');
     }
     return {
       decimalFormat,
       propTitle,
+      server
     };
   },
 });
@@ -24,7 +26,7 @@ export default defineComponent({
 
 <template>
   <div class="good-card">
-    <van-image fit="contain" class="good-card-pic" :src="`http://192.168.46.108:9000/demo/api/img/media/${good.commodity__img__path}`" />
+    <van-image fit="contain" class="good-card-pic" :src="`http://${server}/demo/api/img/media/${good.commodity__img__path}`" />
     <div class="good-card-content">
       <div class="good-card-title">{{ good.commodity__name }}</div>
       <div class="good-card-desc">

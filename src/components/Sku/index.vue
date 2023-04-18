@@ -16,6 +16,8 @@ const props = defineProps({
   initialSku: { type: Object as PropType<IInitialSku>, default: () => ({}) },
 });
 
+const server = import.meta.env.VITE_APP_SERVER_IP;
+
 const emit = defineEmits(['update:show', 'confirm']);
 
 const popupStyle = {
@@ -165,7 +167,7 @@ function onSubmit() {
     @click-overlay="onClose"
   >
     <div v-if="sku.goodInfo" class="sku-header van-hairline--bottom">
-      <van-image class="sku-header-pic" :src="`http://192.168.46.108:9000/demo/api/img/media/${sku.goodInfo.pic}`" fit="cover" />
+      <van-image class="sku-header-pic" :src="`http://${server}/demo/api/img/media/${sku.goodInfo.pic}`" fit="cover" />
       <div class="sku-header-good-info">
         <div class="sku-header-good-name van-multi-ellipsis--l2">{{ sku.goodInfo.name }}</div>
         <div class="sku-header-good-info-bd">
