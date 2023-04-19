@@ -101,16 +101,16 @@ function onOrderDelete(item: Recordable, index: number) {
           去支付
         </van-button>
       </template>
-      <template v-if="item.status === 1">
-        <van-button icon="service" class="list-item-action-btn" round @click.stop="onConcatService(item)">
-          联系客服
-        </van-button>
-      </template>
+<!--      <template v-if="item.status === 1">-->
+<!--        <van-button icon="service" class="list-item-action-btn" round @click.stop="onConcatService(item.id)">-->
+<!--          联系客服-->
+<!--        </van-button>-->
+<!--      </template>-->
       <template v-if="Number(item.status) === 2">
-        <van-button class="list-item-action-btn" round @click.stop="onOrderClicked(item)">确认收货</van-button>
+        <van-button class="list-item-action-btn" round @click.stop="onOrderClicked(item.id)">确认收货</van-button>
       </template>
       <template v-if="Number(item.status) === 3">
-        <van-button class="list-item-action-btn" round @click.stop="onOrderClicked(item)">评价</van-button>
+        <van-button class="list-item-action-btn" round @click.stop="onOrderClicked(item.id)">评价</van-button>
       </template>
     </div>
     <!-- ▲ 操作按钮组 -->

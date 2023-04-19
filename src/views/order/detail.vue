@@ -22,6 +22,7 @@ const server = import.meta.env.VITE_APP_SERVER_IP
 const router = useRouter();
 const route = useRoute();
 const orderStore = useOrderStore();
+const submitLoading = ref(false);
 
 const isLoading = ref(false);
 const orderInfo = ref<Recordable>({});
@@ -105,14 +106,19 @@ function onOrderDelete(orderId: number) {
 
 function onOrderPay(order_id: any, customer_id: any) {
   Toast({ message: '支付中请稍等', duration: 2500 });
+  submitLoading.value = true;
   const  params  = { order_id, customer_id}
   setTimeout(() => {
     API_WALLET.walletPayment(params)
       .then((res) => {
         Toast({ message: res.msg, duration: 1500 });
+        submitLoading.value = false;
+        onRefresh()
       })
       .catch((error) => {
         Toast({ message: error.msg, duration: 1500 });
+        submitLoading.value = false;
+        onRefresh()
       })
   }, 3000)
 
@@ -340,7 +346,7 @@ function getDetail() {
             <van-button class="action-bar-btn" round plain @click.stop="onOrderCancel(order.id)">
               取消订单
             </van-button>
-            <van-button class="action-bar-btn" round type="primary" @click.stop="onOrderPay(order.id, useUserStore().userInfo.id)">
+            <van-button class="action-bar-btn" :loading="submitLoading" round type="primary" @click.stop="onOrderPay(order.id, useUserStore().userInfo.id)">
               去支付
             </van-button>
           </template>
