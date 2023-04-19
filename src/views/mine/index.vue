@@ -98,8 +98,8 @@ import ICON_ART from '@/assets/images/icon_art.png';
 
 import { useUserStore } from '@/store/modules/user';
 import { usePage } from '@/hooks/shared/usePage';
-import {router} from "@/router";
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 onMounted(() => {
   if (unref(hasLogin)) {
     // userStore.getUserDetail();
