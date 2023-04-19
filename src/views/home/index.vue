@@ -77,6 +77,22 @@ function onGoodClicked(id: number) {
 <template>
   <!--轮播图-->
   <div class="container">
+    <van-sticky>
+      <div class="header">
+        <form action="#" class="search-form">
+          <van-search
+            class="search-field"
+            shape="round"
+            show-action
+            placeholder="商品关键词"
+          >
+            <template #action>
+              <div style="color: #1ba784" >搜索</div>
+            </template>
+          </van-search>
+        </form>
+      </div>
+    </van-sticky>
 <!--    <div class="swiper">-->
 <!--      <van-swipe :autoplay="5000" class="swiper">-->
 <!--        <van-swipe-item-->

@@ -214,7 +214,7 @@ const afterSaleTitle = ref('');
     <!-- 商品导航栏 -->
     <van-action-bar>
       <van-action-bar-icon icon="thumb-circle-o" text="首页" to="/home" replace />
-      <van-action-bar-icon icon="chat-o" text="客服" @click="onConcatService" />
+      <van-action-bar-icon icon="balance-pay" text="钱包" @click="router.push('/wallet')" />
       <van-action-bar-icon icon="cart-o" text="购物车" to="/cart" :badge="cartCount" replace />
       <van-action-bar-button type="warning" text="加入购物车" @click="onSkuShow('addCart')" />
       <van-action-bar-button type="danger" text="立即购买" @click="onSkuShow" />
