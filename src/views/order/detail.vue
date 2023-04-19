@@ -14,6 +14,7 @@ import { decimalFormat } from '@/utils/format';
 
 import { useOrderStore } from '@/store/modules/order';
 import { useUserStore} from '@/store/modules/user'
+import moment from "moment";
 
 onMounted(() => {
   getDetail();
@@ -311,7 +312,7 @@ function getDetail() {
           </div>
           <div class="order-no-p">
             下单时间：
-            <span class="order-no-p-value"> {{ order.created_time }}</span>
+            <span class="order-no-p-value"> {{ moment(order.created_time).format('YYYY-MM-DD HH:mm:ss') }}</span>
           </div>
           <div class="order-no-p">
             支付方式：
