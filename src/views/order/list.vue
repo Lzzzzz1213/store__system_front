@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, reactive, ref, unref } from 'vue';
+import {onBeforeMount, onMounted, reactive, ref, unref} from 'vue';
 import { useRoute } from 'vue-router';
 
 import API_ORDER from '@/apis/order';
@@ -7,14 +7,14 @@ import ProList from '@/components/ProList/index.vue';
 import OrderItem from './components/OrderItem.vue';
 import { orderListModel } from '@/model/modules/order/list';
 import { useUserStore } from  '@/store/modules/user'
-onMounted(() => {
+import {router} from "@/router";
+
+onBeforeMount(() => {
   const { status } = route.query;
   if (status) {
     active.value = unref(tabList).findIndex((item) => item.status === status);
   }
-  //
 });
-
 const route = useRoute();
 
 const tabList = ref<Recordable[]>([
@@ -22,7 +22,7 @@ const tabList = ref<Recordable[]>([
   { name: '待付款', status: '0' },
   { name: '待发货', status: '1' },
   { name: '待收货', status: '2' },
-  { name: '待评价', status: '3' },
+  { name: '已完成', status: '3' },
 ]);
 const active = ref(0);
 
@@ -87,7 +87,8 @@ function loadListAfter(data) {
             @search="onSearch"
           >
             <template #action>
-              <div v-if="keyword" @click="onSearch">搜索</div>
+              <div v-if="keyword" style="color: #1ba784" @click="onSearch">订单搜索</div>
+              <div v-else style="color: #1ba784" @click="router.push( '/mine' )">个人中心</div>
             </template>
           </van-search>
         </form>

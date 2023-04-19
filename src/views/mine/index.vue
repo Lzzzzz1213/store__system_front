@@ -59,7 +59,7 @@
           </div>
         </div>
         <div class="order-list">
-          <div v-for="(item, index) in orderList" :key="index" class="order-list-item" @click="goPage(item.path)">
+          <div v-for="(item, index) in orderList" :key="index" class="order-list-item" @click="router.push( item.path );">
             <van-icon class="order-list-item-icon" :name="item.icon" :badge="item.count" />
             <div class="order-list-item-title">{{ item.label }}</div>
           </div>
@@ -98,6 +98,7 @@ import ICON_ART from '@/assets/images/icon_art.png';
 
 import { useUserStore } from '@/store/modules/user';
 import { usePage } from '@/hooks/shared/usePage';
+import {router} from "@/router";
 
 onMounted(() => {
   if (unref(hasLogin)) {
@@ -115,47 +116,47 @@ const balance = ref<number>(0);
 const score = ref(undefined);
 const couponCanUse = ref(undefined);
 // 我的订单
-// const orderList = ref<Recordable[]>([
-//   {
-//     value: '',
-//     label: '待付款',
-//     icon: 'pending-payment',
-//     path: '/order/list?status=0',
-//     count: undefined,
-//     countKey: 'count_id_no_pay',
-//   },
-//   {
-//     value: '',
-//     label: '待发货',
-//     icon: 'tosend',
-//     path: '/order/list?status=1',
-//     count: undefined,
-//     countKey: 'count_id_no_transfer',
-//   },
-//   {
-//     value: '',
-//     label: '待收货',
-//     icon: 'logistics',
-//     path: '/order/list?status=2',
-//     count: undefined,
-//     countKey: 'count_id_no_confirm',
-//   },
-//   {
-//     value: '',
-//     label: '评价',
-//     icon: 'comment-o',
-//     path: '/order/list?status=3',
-//     count: undefined,
-//     countKey: 'count_id_no_reputation',
-//   },
-//   {
-//     value: '',
-//     label: '退款/售后',
-//     icon: 'after-sale',
-//     path: '/refund',
-//     count: undefined,
-//   },
-// ]);
+const orderList = ref<Recordable[]>([
+  {
+    value: '',
+    label: '待付款',
+    icon: 'pending-payment',
+    path: '/order/list?status=0',
+    count: undefined,
+    countKey: 'count_id_no_pay',
+  },
+  {
+    value: '',
+    label: '待发货',
+    icon: 'tosend',
+    path: '/order/list?status=1',
+    count: undefined,
+    countKey: 'count_id_no_transfer',
+  },
+  {
+    value: '',
+    label: '待收货',
+    icon: 'logistics',
+    path: '/order/list?status=2',
+    count: undefined,
+    countKey: 'count_id_no_confirm',
+  },
+  {
+    value: '',
+    label: '已完成',
+    icon: 'comment-o',
+    path: '/order/list?status=3',
+    count: undefined,
+    countKey: 'count_id_no_reputation',
+  },
+  // {
+  //   value: '',
+  //   label: '退款/售后',
+  //   icon: 'after-sale',
+  //   path: '/refund',
+  //   count: undefined,
+  // },
+]);
 
 // 常用功能
 const toolList = ref<Recordable[]>([
@@ -367,7 +368,7 @@ function getCounts() {
 
     &-item {
       box-sizing: border-box;
-      width: 20%;
+      width: 25%;
       text-align: center;
 
       .van-icon {
