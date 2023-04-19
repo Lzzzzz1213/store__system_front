@@ -24,6 +24,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
   console.log(`=== run ${command} ${dayjs().format('YYYY-MM-DD HH:mm:ss')} ===`);
   const root = process.cwd();
   const env = loadEnv(mode, root);
+  const server = env.VITE_APP_SERVER_IP
 
   return {
     base: './',
@@ -51,9 +52,9 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       //   },
       // },
       proxy: {
-        /** 基础服务 */
+        /** 基础服务 192.168.46.108:9000 */
         "/demo/api": {
-          target: "http://192.168.46.108:9000/demo/api",
+          target: `http://${server}/demo/api`,
           ws: true,
           /** 是否允许跨域 */
           changeOrigin: true,
