@@ -2,16 +2,17 @@
 import type { PropType } from 'vue';
 import { ref, unref } from 'vue';
 import { Toast } from 'vant';
-import API_ORDER from '@/apis/order';
+import API_EVALUATE from '@/apis/evaluate';
 import { reputation2Rate } from '@/model/modules/good/reputation';
-
+import {useUserStore} from "@/store/modules/user";
 import { usePage } from '@/hooks/shared/usePage';
 
 const props = defineProps({
   show: { type: Boolean },
-  goods: { type: Array as PropType<Recordable[]>, default: () => [] },
-  orderInfo: { type: Object as PropType<Recordable>, default: () => {} },
+  orderInfo: { type: Object as any, default: () => {} },
 });
+
+const emit = defineEmits(['update:show', 'success']);
 
 const { token } = usePage();
 
@@ -24,8 +25,6 @@ const popupStyle = {
 };
 const rateValue = ref(5);
 const rateRemark = ref('');
-
-const emit = defineEmits(['update:show', 'success']);
 
 function onClose() {
   handleShowChange(false);
@@ -40,33 +39,25 @@ function handleShowChange(v: boolean) {
 }
 
 function onSubmit() {
-  const reputations = props.goods.map((item: Recordable) => ({
-    id: item.id,
-    reputation: reputation2Rate(unref(rateValue)), // 0 差评 1 中评 2 好评
-    remark: unref(rateRemark), // 评价备注，限200字符
-  }));
-
-  const params = {
-    token: unref(token),
-    orderId: props.orderInfo.id,
-    reputations,
-  };
-
+  const data = {
+    grade: reputation2Rate(unref(rateValue)),
+    remark: unref(rateRemark),
+    customer: useUserStore().userInfo.id,
+    order: props.orderInfo
+  }
   Toast.loading({
     overlay: true,
     message: '加载中...',
-    duration: 0,
+    duration: 2000,
   });
-
-  API_ORDER.orderReputation({ postJsonString: JSON.stringify(params) })
-    .then(() => {
-      Toast({ message: '评价成功!', duration: 1500 });
-      onClose();
-      emit('success');
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  API_EVALUATE.orderReputation(data).then((res) => {
+        Toast({ message: '评价成功!', duration: 1500 });
+        onClose();
+        emit('success');
+  }).catch((error) => {
+    Toast({ message: '评价失败，查看日志信息!', duration: 1500 });
+    console.log(error)
+  })
 }
 </script>
 

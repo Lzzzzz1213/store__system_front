@@ -137,11 +137,11 @@ export function orderRefundApplyInfo(data?: Recordable) {
 /**
  * 评价接口
  */
-export function orderReputation(data?: Recordable) {
+export function orderReputation(data: any) {
   return request({
-    url: `/order/reputation`,
+    url: "/evaluate/add/",
     method: 'post',
-    data,
+    data: data,
   });
 }
 

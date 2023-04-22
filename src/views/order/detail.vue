@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import API_ORDER from '@/apis/order';
 import API_USER from '@/apis/user';
 import API_WALLET from '@/apis/wallet';
+import API_EVALUATE from '@/apis/evaluate';
 import { setClipboardData } from '@/utils/helpers/clipboard';
 import Price from '@/components/Price/index.vue';
 import OrderSteps from './components/OrderSteps.vue';
@@ -18,13 +19,14 @@ import moment from "moment";
 
 onMounted(() => {
   getDetail();
+  getEvaluateState();
 });
 const server = import.meta.env.VITE_APP_SERVER_IP
 const router = useRouter();
 const route = useRoute();
 const orderStore = useOrderStore();
 const submitLoading = ref(false);
-
+const evaluate = ref(false)
 const isLoading = ref(false);
 const orderInfo = ref<Recordable>({});
 // const goods = ref<Recordable[]>([]);
@@ -75,7 +77,23 @@ function onOrderReputation() {
 function onRateSuccess() {
   onRefresh();
 }
-
+function getEvaluateState() {
+  API_EVALUATE.getOrderReputationByOderId(route.query.id)
+    .then((res) => {
+    if (res.state === 1) {
+      evaluate.value = true
+      return
+    }
+    evaluate.value = false
+  })
+    .catch((error) => {
+      Toast.loading({
+        overlay: true,
+        message: '服务器出现问题',
+        duration: 2000,
+      });
+    })
+}
 const closeTime = ref(0);
 function onCountDownFinish() {
   onRefresh();
@@ -171,6 +189,7 @@ function onCopy(text: string) {
 
 function onRefresh() {
   getDetail();
+  getEvaluateState();
 }
 
 function getDetail() {
@@ -359,14 +378,14 @@ function getDetail() {
           <template v-if="order.status === '2'">
             <van-button class="action-bar-btn" round @click.stop="onOrderDelivery(orderInfo.id)">确认收货</van-button>
           </template>
-          <template v-if="order.status === '3'">
+          <template v-if="order.status === '3' && evaluate">
             <van-button class="action-bar-btn" round @click.stop="onOrderReputation">评价</van-button>
           </template>
           <!-- ▲ 操作按钮组 -->
         </div>
       </div>
       <!-- 评价弹层 -->
-      <OrderRate v-model:show="ratePopupShow" :goods="goods" :order-info="orderInfo" @success="onRateSuccess" />
+      <OrderRate v-model:show="ratePopupShow" :order-info="order.id" @success="onRateSuccess" />
     </div>
   </van-pull-refresh>
 </template>

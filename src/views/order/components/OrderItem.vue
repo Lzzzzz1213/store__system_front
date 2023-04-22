@@ -6,12 +6,24 @@ import Price from '@/components/Price/index.vue';
 import { decimalFormat } from '@/utils/format';
 
 import { useOrderStore } from '@/store/modules/order';
-defineProps({
+import API_WALLET from '@/apis/wallet';
+import API_EVALUATE from "@/apis/evaluate";
+import {onMounted, ref} from "vue";
+
+// 以前没有props，后续渲染有问题直接来这里
+const props = defineProps({
   item: { type: Object as PropType<Recordable>, default: () => {} },
   first: { type: Object as PropType<Recordable>, default: () => {} },
   index: { type: Number, default: 0 },
 });
+
 const emit = defineEmits(['delete']);
+
+onMounted(() => {
+  getEvaluateState();
+})
+
+const evaluate = ref(false)
 const router = useRouter();
 const orderStore = useOrderStore();
 const server = import.meta.env.VITE_APP_SERVER_IP
@@ -53,6 +65,24 @@ function onOrderDelete(item: Recordable, index: number) {
     .catch((error) => {
       console.error(error);
     });
+}
+
+function getEvaluateState() {
+  API_EVALUATE.getOrderReputationByOderId(props.item.id)
+    .then((res) => {
+      if (res.state === 1) {
+        evaluate.value = true
+        return
+      }
+      evaluate.value = false
+    })
+    .catch((error) => {
+      Toast.loading({
+        overlay: true,
+        message: '服务器出现问题',
+        duration: 2000,
+      });
+    })
 }
 </script>
 <template>
@@ -109,7 +139,7 @@ function onOrderDelete(item: Recordable, index: number) {
       <template v-if="Number(item.status) === 2">
         <van-button class="list-item-action-btn" round @click.stop="onOrderClicked(item.id)">确认收货</van-button>
       </template>
-      <template v-if="Number(item.status) === 3">
+      <template v-if="Number(item.status) === 3 && evaluate">
         <van-button class="list-item-action-btn" round @click.stop="onOrderClicked(item.id)">评价</van-button>
       </template>
     </div>
