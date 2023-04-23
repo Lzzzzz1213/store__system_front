@@ -255,6 +255,14 @@ export function walletPaymentApi(params){
   })
 }
 
+export function upUserHeadImg(data: any) {
+  return request({
+    url: "/user/upHead/",
+    method: "post",
+    data: data
+  })
+}
+
 export default {
   loginApi,
   userAmount,
@@ -281,5 +289,7 @@ export default {
   myWalletCountApi,
   myWalletRechargeApi,
   myWalletConsumeApi,
-  walletPaymentApi
+  walletPaymentApi,
+  // 头像上传
+  upUserHeadImg
 };

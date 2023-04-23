@@ -7,6 +7,7 @@ import API_ORDER from '@/apis/order';
 import API_USER from '@/apis/user';
 import API_WALLET from '@/apis/wallet';
 import API_EVALUATE from '@/apis/evaluate';
+import API_LOGISTICS from '@/apis/logistics';
 import { setClipboardData } from '@/utils/helpers/clipboard';
 import Price from '@/components/Price/index.vue';
 import OrderSteps from './components/OrderSteps.vue';
@@ -20,6 +21,7 @@ import moment from "moment";
 onMounted(() => {
   getDetail();
   getEvaluateState();
+  getOrderLogistics();
 });
 const server = import.meta.env.VITE_APP_SERVER_IP
 const router = useRouter();
@@ -217,6 +219,20 @@ function getDetail() {
       isLoading.value = false;
     });
 }
+
+function getOrderLogistics() {
+  API_LOGISTICS.getOrderLogistics(route.query.id)
+    .then((res) => {
+    logistics.value = res.data
+  })
+    .catch((error) => {
+      console.log(error)
+      Toast.fail({
+        message: `服务器错误${error}`,
+        duration: 5000,
+      });
+    })
+}
 </script>
 
 <template>
@@ -254,10 +270,10 @@ function getDetail() {
           </div>
         </div>
         <van-cell title="物流信息" class="cell">
-          <template v-if="logistics.trackingNumber">
-            {{ logistics.shipperName }} {{ logistics.trackingNumber }}
+          <template v-if="logistics.logistics_no">
+             物流单号: {{ logistics.logistics_no }}
           </template>
-          <template v-else>无</template>
+          <template v-else>{{ logistics.msg }}</template>
         </van-cell>
       </template>
       <!-- 商品列表 -->

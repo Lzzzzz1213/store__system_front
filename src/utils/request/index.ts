@@ -12,7 +12,7 @@ function createRequest<T = ServiceResult>(config: AxiosRequestConfig): Promise<T
    */
   const instance: AxiosInstance = axios.create({
     baseURL: getAPI(),
-    timeout: 1000 * 5,
+    timeout: 1000 * 2,
   });
 
   /**
