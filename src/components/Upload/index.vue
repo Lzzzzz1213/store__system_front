@@ -1,8 +1,9 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import {defineComponent, unref} from 'vue';
 import { Toast } from 'vant';
 import Compressor from 'compressorjs';
 import API_DFS from '@/apis/dfs';
+import API_USER from '@/apis/user';
 
 export default defineComponent({
   name: 'Upload',
@@ -24,18 +25,22 @@ export default defineComponent({
     }
     function afterRead(file) {
       const formData = new FormData();
-      formData.append('upfile', file.file);
-
+      formData.append("path", new File([file.file],file.file.name,file.file)) // 所有文件转为file
+      formData.append("name", file.file.name)
       Toast.loading({
         forbidClick: true,
         message: '上传中...',
-        duration: 0,
+        duration: 2000,
       });
 
-      API_DFS.dfsUploadFile(formData)
+      API_DFS.uploadImg(formData)
         .then((res) => {
-          Toast.clear();
-          if (res.data.url) {
+          console.log(res)
+          Toast("上传成功")
+          setTimeout(()=>{
+            Toast.clear();
+          },3000)
+          if (res.data.id) {
             emit('on-success', res);
           } else {
             Toast({
@@ -46,6 +51,7 @@ export default defineComponent({
           }
         })
         .catch((error) => {
+          console.log(error)
           emit('on-error', error);
         });
     }
@@ -59,5 +65,5 @@ export default defineComponent({
 </script>
 
 <template>
-  <van-uploader :before-read="beforeRead" :after-read="afterRead"> <slot /> </van-uploader>
+  <van-uploader :before-read="beforeRead" :after-read="afterRead" accept=".jpeg,.png,.jpg" > <slot /> </van-uploader>
 </template>

@@ -8,45 +8,48 @@ import AffixBarAction from '@/components/AffixBarAction/index.vue';
 import Upload from '@/components/Upload/index.vue';
 import { isEmpty } from '@/utils/validate';
 import { assets } from '@/constants';
+import moment from "moment";
 import AreaField from '@/components/AreaField/index.vue';
 
 import { useUserStore } from '@/store/modules/user';
 
 onMounted(() => {
-  avatarUrl.value = unref(userInfo).avatarUrl ?? '';
-  nick.value = unref(userInfo).nick ?? '';
-  province.value = unref(userInfo).province ?? '';
-  city.value = unref(userInfo).city ?? '';
+  getUserDetail()
 });
 
 const router = useRouter();
 const userStore = useUserStore();
+const server = import.meta.env.VITE_APP_SERVER_IP
 
 const userInfo = computed(() => userStore.getUserInfo);
-const avatarUrl = ref('');
-const nick = ref('');
-const province = ref('');
-const city = ref('');
-const areaLabel = computed(() => {
-  if (!unref(province)) {
-    return '';
-  }
 
-  if (unref(province) === unref(city)) {
-    return unref(city);
-  }
-
-  return `${unref(province)} - ${unref(city)}`;
-});
+const email = ref('');
+const phone = ref('');
+const img_path = ref('');
+const last_login = ref('');
+const username = ref('');
+const id = ref(0);
+const img = ref(0);
+// const areaLabel = computed(() => {
+//   if (!unref(province)) {
+//     return '';
+//   }
+//
+//   if (unref(province) === unref(city)) {
+//     return unref(city);
+//   }
+//
+//   return `${unref(province)} - ${unref(city)}`;
+// });
 
 function onFileSuccess(res: any) {
-  avatarUrl.value = res.data.url;
+  img_path.value = `http://${server}/demo/api/img${res.data.path}`;
 }
 
-function onAreaChange(values: Array<AreaColumnOption>) {
-  province.value = values[0].name;
-  city.value = values[1].name;
-}
+// function onAreaChange(values: Array<AreaColumnOption>) {
+//   province.value = values[0].name;
+//   city.value = values[1].name;
+// }
 
 function onSubmit() {
   if (
@@ -90,6 +93,22 @@ function onSubmit() {
       console.error(error);
     });
 }
+
+function getUserDetail() {
+  API_USER.userDetail(userStore.userInfo.id)
+    .then((res) => {
+      email.value = res.data[0].email
+      phone.value = res.data[0].phone
+      img_path.value = `http://${server}/demo/api/img/media/${res.data[0].img_path}`;
+      last_login.value = moment(res.data[0].last_login).format('YYYY-MM-DD HH:mm:ss')
+      username.value = res.data[0].username
+      id.value = res.data[0].id
+  })
+    .catch((error) => {
+      console.log(error)
+    })
+
+}
 </script>
 
 <template>
@@ -97,24 +116,36 @@ function onSubmit() {
     <div class="header">
       <Upload @on-success="onFileSuccess">
         <div class="avatar">
-          <van-image class="avatar-img" :src="avatarUrl || assets.avatar" />
+          <van-image class="avatar-img" :src="img_path || assets.avatar" />
           <div class="avatar-title">点击更换头像</div>
         </div>
       </Upload>
     </div>
     <div class="nick van-hairline--bottom">
-      <div class="nick-label">昵称</div>
-      <van-field v-model="nick" placeholder="12个字以内" />
+      <div class="nick-label">用户名</div>
+      <van-field v-model="username" readonly />
     </div>
-    <AreaField
-      :model-value="areaLabel"
-      label="所在地"
-      placeholder="点击选择城市"
-      input-align="right"
-      :border="false"
-      :columns-num="2"
-      @change="onAreaChange"
-    />
+    <div class="nick van-hairline--bottom">
+      <div class="nick-label">手机号</div>
+      <van-field v-model="phone" readonly />
+    </div>
+    <div class="nick van-hairline--bottom">
+      <div class="nick-label">邮箱号</div>
+      <van-field v-model="email" readonly />
+    </div>
+    <div class="nick van-hairline--bottom">
+      <div class="nick-label">上次登录时间</div>
+      <van-field v-model="last_login" readonly />
+    </div>
+<!--    <AreaField-->
+<!--      :model-value="areaLabel"-->
+<!--      label="所在地"-->
+<!--      placeholder="点击选择城市"-->
+<!--      input-align="right"-->
+<!--      :border="false"-->
+<!--      :columns-num="2"-->
+<!--      @change="onAreaChange"-->
+<!--    />-->
 
     <AffixBarAction @submit="onSubmit" />
   </div>

@@ -35,13 +35,13 @@ export function userCashLog(data?: Recordable) {
 /**
  * 查看用户详情
  */
-export function userDetail(data?: Recordable) {
-  return request({
-    url: `/user/detail`,
-    method: 'get',
-    params: data,
-  });
-}
+// export function userDetail(data?: Recordable) {
+//   return request({
+//     url: `/user/detail`,
+//     method: 'get',
+//     params: data,
+//   });
+// }
 
 /**
  * 修改用户信息
@@ -244,6 +244,7 @@ export function myWalletConsumeApi(id: any, params) {
 
 
 import axios from "axios";
+// import {Toast} from "vant";
 const requestForPayment = axios.create({
   baseURL:'http://192.168.46.108:8080/pay'
 })
@@ -255,11 +256,10 @@ export function walletPaymentApi(params){
   })
 }
 
-export function upUserHeadImg(data: any) {
+export function userDetail(id: any) {
   return request({
-    url: "/user/upHead/",
-    method: "post",
-    data: data
+    url: `/user/detail/${id}/`,
+    method: 'get'
   })
 }
 
@@ -290,6 +290,4 @@ export default {
   myWalletRechargeApi,
   myWalletConsumeApi,
   walletPaymentApi,
-  // 头像上传
-  upUserHeadImg
 };
