@@ -326,6 +326,14 @@ export function goodsByCategory(params) {
     params,
   });
 }
+
+export function goodReputation(id: any, params) {
+  return request({
+    url: `/commodity/evaluate/${id}/`,
+    method: 'get',
+    params
+  })
+}
 export default {
   goodsByCategory,
   goodsSeckillGrab,
@@ -356,5 +364,6 @@ export default {
   goodsPriceDay,
   goodsRebate,
   goodsReputation,
-  goodDetail
+  goodDetail,
+  goodReputation
 };

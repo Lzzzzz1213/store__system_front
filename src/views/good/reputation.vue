@@ -4,18 +4,18 @@
       <template #item="{ item }">
         <div class="list-item">
           <div class="list-item-header van-hairline--bottom">
-            <div class="list-item-avatar"><van-image :src="item.avatarUrl" alt="" /></div>
+            <div class="list-item-avatar"><van-image :src="`http://${server}/demo/api/img/media/${item.customer__img__path}`" alt="" /></div>
             <div class="list-item-inner">
-              <div class="list-item-name">{{ item.nickName }}</div>
+              <div class="list-item-name">{{ item.customer__username }}</div>
               <div class="list-item-star">
-                <van-rate v-model="item.rate" :size="14" color="#f44" void-icon="star" void-color="#eee" readonly />
+                <van-rate v-model="item.grade" :size="14" color="#f44" void-icon="star" void-color="#eee" readonly />
               </div>
             </div>
             <div class="list-item-date">{{ item.date }}</div>
           </div>
           <div class="list-item-content">
             <div class="list-item-remark">{{ item.remark }}</div>
-            <div v-if="item.property" class="list-item-prop">{{ item.property }}</div>
+<!--            <div v-if="item.property" class="list-item-prop">{{ item.property }}</div>-->
           </div>
         </div>
       </template>
@@ -37,6 +37,7 @@ export default {
         pageSize: 20,
       },
       listEmptyText: '暂无评价',
+      server: ''
     };
   },
   created() {
@@ -44,13 +45,12 @@ export default {
   },
   methods: {
     loadList() {
+      this.server = import.meta.env.VITE_APP_SERVER_IP
       const params = {
-        goodsId: this.$route.query.goodsId,
-        page: this.pagination.pageCurrent,
-        pageSize: this.pagination.pageSize,
+        currentPage: this.pagination.pageCurrent,
+        size: this.pagination.pageSize,
       };
-
-      return API_GOODS.goodsReputation(params);
+      return API_GOODS.goodReputation(this.$route.query.goodsId,params);
     },
     loadListAfter(data) {
       const records = goodReputationModel(data?.result ?? []);

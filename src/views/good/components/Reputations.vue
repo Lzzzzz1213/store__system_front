@@ -3,27 +3,27 @@ import { onMounted, ref } from 'vue';
 import API_GOODS from '@/apis/goods';
 import { goodReputationModel } from '@/model/modules/good/reputation';
 
-// 商品评价
-onMounted(() => {
-  getGoodsReputation();
-});
-
 const props = defineProps({
   goodsId: { type: [String, Number] },
 });
 
+// 商品评价
+onMounted(() => {
+  getGoodsReputation();
+});
+const server = import.meta.env.VITE_APP_SERVER_IP
 const reputationList = ref<Recordable>([]);
 const reputationTotal = ref(0);
 
 function getGoodsReputation() {
-  API_GOODS.goodsReputation({ goodsId: props.goodsId, page: 1, pageSize: 1 }).then((res) => {
-    const records = res.data?.result ?? [];
-    const total = res.data?.totalRow ?? 0;
-    if (records.length) {
-      reputationTotal.value = total;
-      reputationList.value = goodReputationModel(records);
-    }
-  });
+  API_GOODS.goodReputation(props.goodsId, {currentPage: 1, size: 2}).then((res)=>{
+      const records = res.data ?? [];
+      const total = res.total ?? 0;
+      if (records.length) {
+        reputationTotal.value = total;
+        reputationList.value = goodReputationModel(records);
+      }
+  })
 }
 </script>
 
@@ -40,19 +40,21 @@ function getGoodsReputation() {
     <van-cell v-else class="mb10" title="商品评价" value="暂无评价" />
     <div v-for="(item, index) in reputationList" :key="index" class="reputation-inner">
       <div class="reputation-inner-hd">
-        <van-image class="reputation-inner-media" :src="item.avatarUrl" />
-        <div class="reputation-inner-name">{{ item.nickName }}</div>
+        <van-image class="reputation-inner-media" :src="`http://${server}/demo/api/img/media/${item.customer__img__path}`" />
+        <div class="reputation-inner-name">{{ item.customer__username }}</div>
         <div class="reputation-inner-stars">
-          <van-rate v-model="item.rate" :size="14" color="#f44" void-icon="star" void-color="#eee" readonly />
+          <van-rate v-model="item.grade" :size="14" color="#f44" void-icon="star" void-color="#eee" readonly />
         </div>
       </div>
-      <!-- <div class="reputation-inner-bd"> -->
-      <!-- <span class="reputation-inner-tag">质量不错</span> -->
-      <!-- <span class="reputation-inner-tag">下次再来</span> -->
-      <!-- </div> -->
+       <div class="reputation-inner-bd">
+       <span v-if="item.grade === 5" class="reputation-inner-tag">质量不错</span>
+       <span v-if="item.grade >= 4" class="reputation-inner-tag">下次再来</span>
+       <span v-if="item.grade <=3 && item.grade >=2" class="reputation-inner-tag">我觉得还行</span>
+       <span v-if="item.grade ===1" class="reputation-inner-tag">太糟糕了</span>
+       </div>
       <div class="reputation-inner-ft">
         <div>{{ item.remark }}</div>
-        <div class="reputation-inner-prop">{{ item.property }}</div>
+<!--        <div class="reputation-inner-prop">{{ item.property }}</div>-->
       </div>
     </div>
   </div>

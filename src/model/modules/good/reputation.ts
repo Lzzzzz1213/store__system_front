@@ -7,11 +7,15 @@ import { mobileShow } from '@/utils/format';
  */
 export function rate2Reputation(val: number) {
   switch (val) {
-    case 0:
-      return 1;
     case 1:
-      return 3;
+      return 1;
     case 2:
+      return 2;
+    case 3:
+      return 3;
+    case 4:
+      return 4;
+    case 5:
       return 5;
     default:
       return 5;
@@ -43,14 +47,12 @@ export function reputation2Rate(val: number) {
  *  商品评价
  * @param {*} data
  */
-export function goodReputationModel(data: Recordable) {
+export function goodReputationModel(data: any) {
   return data.map((v: any) => ({
-    goodId: v.goods.id,
-    avatarUrl: v.user.avatarUrl || assets.avatar,
-    nickName: v.user.nick || (v.user.mobile ? mobileShow(v.user.mobile) : `神秘用户`),
-    rate: rate2Reputation(v.goods.goodReputationStr),
-    remark: v.goods.goodReputationRemark || '此用户没有填写评价',
-    date: v.goods.dateReputation.slice(0, 10),
-    property: v.goods.property,
+    customer__img__path: v.customer__img__path || assets.avatar,
+    customer__username: v.customer__username || (v.customer__username ? mobileShow(v.customer__username) : `神秘用户`),
+    grade: rate2Reputation(v.grade),
+    remark: v.remark || '此用户没有填写评价',
+    date: v.created_time,
   }));
 }

@@ -7,6 +7,8 @@ import API_CART from '@/apis/cart';
 import Plate from '@/components/Plate/index.vue';
 import Sku from '@/components/Sku/index.vue';
 import { ISku, IInitialSku } from '@/components/Sku/typings';
+import Reputations from './components/Reputations.vue';
+
 import { getAfterSaleTitle } from '@/model/modules/order/afterSale';
 
 import { useOrderStore } from '@/store/modules/order';
@@ -202,6 +204,7 @@ const afterSaleTitle = ref('');
         </div>
       </template>
     </van-cell>
+    <Reputations class="mt10" :goods-id="route.query.id as number" />
     <Plate title="商品详情" class="mt10" />
     <div class="goods-content" v-html="content"></div>
     <van-image class="swiper-item-img" fit="contain" :src="`http://${server}/demo/api/img/media/${commodityDetail.pic.path}`" alt="">
