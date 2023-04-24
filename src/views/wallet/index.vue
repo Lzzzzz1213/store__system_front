@@ -69,7 +69,7 @@ export default {
         this.detail = res || {};
       });
       API_USER.myWalletCountApi(useUserStore().userInfo.id).then((res) => {
-        this.sum = res.sum || 0
+        this.sum = res.sum.out_history__sum || 0
       })
     },
   },
