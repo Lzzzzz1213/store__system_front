@@ -3,7 +3,7 @@
     <div class="header">
       <div v-if="hasLogin" class="header-inner" @click="goPage('/profile')">
         <div class="header-tag">个人资料</div>
-        <van-image class="header-avatar" :src="userInfo.headurl || assets.avatar" alt="" @click.stop="onEasterEgg" />
+        <van-image class="header-avatar" :src="headUrl" alt="" @click.stop="onEasterEgg" />
         <div class="header-info">
           <div class="header-nick van-ellipsis mb10">
             {{ userInfo.username || `还没有昵称` }}
@@ -106,10 +106,10 @@ onMounted(() => {
     getCounts();
   }
 });
-
+const server = import.meta.env.VITE_APP_SERVER_IP
 const userStore = useUserStore();
 const { hasLogin, goLogin, goPage } = usePage();
-
+const headUrl = ref<string>('')
 // 统计
 const growth = ref(0); // 成长值
 const balance = ref<number>(0);
@@ -177,6 +177,7 @@ function onEasterEgg() {
 }
 
 function getCounts() {
+  headUrl.value = `http://${server}/demo/api/img/media/${userStore.userInfo.img.img__path}`
   // API_USER.userAmount().then((res) => {
   //   balance.value = res.data?.balance ?? 0;
   //   growth.value = res.data?.growth ?? 0;

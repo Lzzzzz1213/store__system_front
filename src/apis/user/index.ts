@@ -10,6 +10,12 @@ export interface ILoginData {
   type: string
 }
 
+interface IupHeadData {
+  id?: number
+
+  img?: number
+}
+
 /**
  * 查看用户资产
  */
@@ -57,10 +63,10 @@ export function userModify(data?: Recordable) {
 /**
  * 退出登录
  */
-export function userLoginOut(data?: Recordable) {
+export function userLoginOut(data?: string) {
   return request({
-    url: `/user/loginout`,
-    method: 'get',
+    url: "/user/logout/",
+    method: 'post',
     params: data,
   });
 }
@@ -263,6 +269,14 @@ export function userDetail(id: any) {
   })
 }
 
+export function upHead(data: IupHeadData) {
+  return request({
+    url: '/user/head/',
+    method: 'post',
+    data: data
+  })
+}
+
 export default {
   loginApi,
   userAmount,
@@ -290,4 +304,6 @@ export default {
   myWalletRechargeApi,
   myWalletConsumeApi,
   walletPaymentApi,
+  // 更新用户数据
+  upHead
 };

@@ -57,7 +57,7 @@ export const useUserStore = defineStore({
 
       if (this.getToken) {
         try {
-          // await API_USER.userLoginOut();
+          await API_USER.userLoginOut(this.getToken);
         } catch (error) {
           console.error('退出登录失败', error);
         }
@@ -67,11 +67,11 @@ export const useUserStore = defineStore({
       storage.set('token', '');
       this.userInfo = {};
       storage.set('userInfo', {});
-      goLogin && router.push('/login');
+      goLogin && await router.push('/login');
     },
     async getUserDetail() {
       try {
-        const res = await API_USER.userDetail();
+        const res = await API_USER.userDetail(this.userInfo.id);
         const { base = {}, userLevel = {} } = res.data;
 
         this.userInfo = base;

@@ -3,7 +3,7 @@ import { computed, onMounted, ref, unref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Toast } from 'vant';
 import type { AreaColumnOption } from 'vant';
-import API_USER from '@/apis/user';
+import API_USER, {upHead} from '@/apis/user';
 import AffixBarAction from '@/components/AffixBarAction/index.vue';
 import Upload from '@/components/Upload/index.vue';
 import { isEmpty } from '@/utils/validate';
@@ -16,77 +16,39 @@ import { useUserStore } from '@/store/modules/user';
 onMounted(() => {
   getUserDetail()
 });
-
 const router = useRouter();
 const userStore = useUserStore();
 const server = import.meta.env.VITE_APP_SERVER_IP
-
 const userInfo = computed(() => userStore.getUserInfo);
-
 const email = ref('');
 const phone = ref('');
 const img_path = ref('');
 const last_login = ref('');
 const username = ref('');
 const id = ref(0);
-const img = ref(0);
-// const areaLabel = computed(() => {
-//   if (!unref(province)) {
-//     return '';
-//   }
-//
-//   if (unref(province) === unref(city)) {
-//     return unref(city);
-//   }
-//
-//   return `${unref(province)} - ${unref(city)}`;
-// });
-
+const img = ref<number>(-1);
 function onFileSuccess(res: any) {
   img_path.value = `http://${server}/demo/api/img${res.data.path}`;
+  img.value = res.data.id
 }
-
-// function onAreaChange(values: Array<AreaColumnOption>) {
-//   province.value = values[0].name;
-//   city.value = values[1].name;
-// }
-
 function onSubmit() {
-  if (
-    unref(avatarUrl) === unref(userInfo).avatarUrl &&
-    unref(nick) === unref(userInfo).nick &&
-    unref(province) === unref(userInfo).province &&
-    unref(city) === unref(userInfo).city
-  ) {
-    Toast('您没有修改任何东西哦');
+  if (img.value === -1) {
+    Toast('您没有上传头像哦！');
     return;
   }
-  if (isEmpty(unref(nick))) {
-    Toast('昵称不能为空');
-    return;
-  }
-
-  if (isEmpty(unref(province))) {
-    Toast('所在地不能为空');
-    return;
-  }
-
   const params = {
-    nick: unref(nick),
-    avatarUrl: unref(avatarUrl),
-    province: unref(province),
-    city: unref(city),
+    id: userStore.userInfo.id,
+    img: img.value
   };
-
   Toast.loading({
     forbidClick: true,
-    message: '提交中...',
+    message: '正在上传...',
     duration: 0,
   });
 
-  API_USER.userModify(params)
+  API_USER.upHead(params)
     .then(() => {
-      Toast('资料修改成功');
+      Toast('头像修改成功');
       router.back();
     })
     .catch((error) => {
