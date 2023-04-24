@@ -185,6 +185,13 @@ export function orderDetail(id: any){
   })
 }
 
+export function orderCheck(id: any) {
+  return request({
+    url: `/order/check/${id}`,
+    method: 'get'
+  })
+}
+
 export default {
   peisonFeeList,
   orderClose,
@@ -202,4 +209,5 @@ export default {
   orderSet,
   orderStartOrderPeriod,
   orderStatistics,
+  orderCheck
 };

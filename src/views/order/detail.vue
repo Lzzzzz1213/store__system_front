@@ -149,7 +149,7 @@ function onConcatService(_orderId: number) {
   Toast('未开放：客服');
 }
 
-function onOrderDelivery(orderId: number) {
+function onOrderDelivery(id: any) {
   Dialog.confirm({
     title: '提示',
     message: '确认您已收到商品？',
@@ -161,7 +161,7 @@ function onOrderDelivery(orderId: number) {
         message: '加载中...',
         duration: 0,
       });
-      API_ORDER.orderDelivery({ orderId }).then(() => {
+      API_ORDER.orderCheck(id).then(() => {
         Toast({ message: '确认收货成功', duration: 1500 });
         onRefresh();
       });
@@ -221,7 +221,7 @@ function getDetail() {
 }
 
 function getOrderLogistics() {
-  API_LOGISTICS.getOrderLogistics(route.query.id)
+  API_LOGISTICS.getOrderLogistics(order.value.id)
     .then((res) => {
     logistics.value = res.data
   })
@@ -283,7 +283,7 @@ function getOrderLogistics() {
           <span class="section-header-title">商品列表</span>
         </div>
         <div class="list">
-          <div v-for="(item, index) in goods" :key="index" class="list-item" @click="onGoodClicked(item.goodsId)">
+          <div v-for="(item, index) in goods" :key="index" class="list-item" @click="onGoodClicked(item.commodity_id)">
             <van-image fit="contain" class="list-item-pic" :src="`http://${server}/demo/api/img/media/${item.commodity_path}`" />
             <div class="list-item-content">
               <div class="list-item-title">{{ item.commodity_name }}</div>
@@ -392,7 +392,7 @@ function getOrderLogistics() {
 <!--            </van-button>-->
 <!--          </template>-->
           <template v-if="order.status === '2'">
-            <van-button class="action-bar-btn" round @click.stop="onOrderDelivery(orderInfo.id)">确认收货</van-button>
+            <van-button class="action-bar-btn" round @click.stop="onOrderDelivery(order.id)">确认收货</van-button>
           </template>
           <template v-if="order.status === '3' && evaluate">
             <van-button class="action-bar-btn" round @click.stop="onOrderReputation">评价</van-button>
