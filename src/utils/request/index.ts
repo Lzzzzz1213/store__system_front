@@ -22,7 +22,10 @@ function createRequest<T = ServiceResult>(config: AxiosRequestConfig): Promise<T
     if (config.url === '/user/login/'){
       return config
     } else {
-      config.headers.Authorization = "Token " + userStore.getToken
+      if (userStore.getToken){
+        config.headers.Authorization = "Token " + userStore.getToken
+        return config
+      }
       return config
     }
   });
@@ -71,7 +74,7 @@ function createRequest<T = ServiceResult>(config: AxiosRequestConfig): Promise<T
  */
 function serviceErrorHandel(res: ServiceResult) {
   const { code, msg } = res;
-  if (Number(code) === 2000) {
+  if (Number(code) === 401) {
     Toast.clear();
     const userStore = useUserStoreWithOut();
     userStore.logout({ goLogin: true });
@@ -94,8 +97,13 @@ function httpErrorHandle(error: AxiosError) {
 
   if (error?.response) {
     const { status } = error.response;
+    const userStore = useUserStoreWithOut();
 
     switch (status) {
+      case 401:
+        msg = `${status} 没有权限，返回登录！`;
+        userStore.logout({ goLogin: true });
+        break;
       case 403:
         msg = `${status} 网络请求被拒绝`;
         break;
@@ -118,7 +126,7 @@ function httpErrorHandle(error: AxiosError) {
   if (error.message.includes('Network Error')) {
     msg = '当前网络不可用，请检查你的网络设置';
   }
-
+  console.log(msg)
   Toast({
     message: msg || error.toString(),
     duration: 1000 * 3,
