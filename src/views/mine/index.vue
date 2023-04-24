@@ -103,7 +103,7 @@ const router = useRouter();
 onMounted(() => {
   if (unref(hasLogin)) {
     // userStore.getUserDetail();
-    getCounts();
+      getCounts();
   }
 });
 const server = import.meta.env.VITE_APP_SERVER_IP
@@ -115,6 +115,7 @@ const growth = ref(0); // 成长值
 const balance = ref<number>(0);
 const score = ref(undefined);
 const couponCanUse = ref(undefined);
+const img = ref<string>('')
 // 我的订单
 const orderList = ref<Recordable[]>([
   {
@@ -177,27 +178,13 @@ function onEasterEgg() {
 }
 
 function getCounts() {
-  headUrl.value = `http://${server}/demo/api/img/media/${userStore.userInfo.img.img__path}`
-  // API_USER.userAmount().then((res) => {
-  //   balance.value = res.data?.balance ?? 0;
-  //   growth.value = res.data?.growth ?? 0;
-  //   score.value = res.data?.score ?? 0;
-  // });
   API_USER.myWalletApi(useUserStore().userInfo.id).then((res) => {
     balance.value = res.balance ?? 0
   })
-
-  // API_ORDER.orderStatistics().then((res) => {
-  //   const orderCount = res.data;
-  //
-  //   orderList.value.forEach((item) => {
-  //     orderCount[item.countKey] && (item.count = orderCount[item.countKey]);
-  //   });
-  // });
-
-  // API_DISCOUNTS.discountsStatistics().then((res) => {
-  //   couponCanUse.value = res.data?.canUse ?? 0;
-  // });
+  API_USER.userDetail(userStore.userInfo.id).then((res) => {
+    img.value = res.data[0].img_path
+    headUrl.value = `http://${server}/demo/api/img/media/${img.value}`
+  })
 }
 </script>
 <style lang="less" scoped>
