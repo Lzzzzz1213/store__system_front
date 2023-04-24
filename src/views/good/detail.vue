@@ -147,7 +147,7 @@ function addCartHandle() {
   API_CART.shoppingCartAdd(unref(cart)).then((res) =>{
     Toast(res.msg)
   }).catch((error) =>{
-    Toast(error)
+    console.log(error)
   })
 }
 function onConcatService() {

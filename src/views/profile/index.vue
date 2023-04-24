@@ -10,6 +10,8 @@ import { isEmpty } from '@/utils/validate';
 import { assets } from '@/constants';
 import moment from "moment";
 import AreaField from '@/components/AreaField/index.vue';
+import storage from 'good-storage';
+
 
 import { useUserStore } from '@/store/modules/user';
 
@@ -27,9 +29,12 @@ const last_login = ref('');
 const username = ref('');
 const id = ref(0);
 const img = ref<number>(-1);
+const storage_path = ref('')
 function onFileSuccess(res: any) {
   img_path.value = `http://${server}/demo/api/img${res.data.path}`;
   img.value = res.data.id
+  const url = res.data.path
+  storage_path.value = url.slice(6, url.length)
 }
 function onSubmit() {
   if (img.value === -1) {
@@ -49,7 +54,10 @@ function onSubmit() {
   API_USER.upHead(params)
     .then(() => {
       Toast('头像修改成功');
-      router.back();
+      const temp = storage.get("userInfo")
+      temp.img.img__path = storage_path.value
+      storage.set("userInfo", temp)
+      router.push({path: '/mine'})
     })
     .catch((error) => {
       console.error(error);
