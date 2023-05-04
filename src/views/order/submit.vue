@@ -6,6 +6,8 @@ import NP from 'number-precision';
 import API_USER, {userShoppingAddressDefault} from '@/apis/user';
 import API_ORDER from '@/apis/order';
 import API_CART from '@/apis/cart';
+import API_WALLET from '@/apis/wallet';
+
 import { decimalFormat, mobileShow } from '@/utils/format';
 import SelectAddress from './components/SelectAddress.vue';
 import GoodCard from '@/components/GoodCard/index.vue';
@@ -17,9 +19,7 @@ onMounted(() => {
   if (unref(isNeedLogistics)) {
     getAddressInfo();
   }
-
-  // getUserAmount();
-  // getOrderSetInfo();
+  getUserAmount();
 });
 
 const router = useRouter();
@@ -47,7 +47,6 @@ function onAddressSelected(item: Recordable) {
 }
 
 function getAddressInfo() {
-  console.log("2131321", useUserStore().userInfo.id)
   API_USER.userShoppingAddressDefault(useUserStore().userInfo.id).then((res) => {
     addressInfo.value = res.data ?? [];
   });
@@ -56,9 +55,9 @@ function getAddressInfo() {
 // 钱包
 const balance = ref<number>(0);
 function getUserAmount() {
-  API_USER.userAmount().then((res) => {
-    balance.value = res.data?.balance ?? 0;
-  });
+  API_USER.myWalletApi(useUserStore().userInfo.id).then((res) => {
+    balance.value = res.balance ?? 0
+  })
 }
 
 const orderSetInfo = ref<Recordable>({});
@@ -114,13 +113,9 @@ async function createOrder() {
     number: item.number,
   }));
 
-  const params: Recordable = {
-    // calculate: false, // true 不实际下单，而是返回价格计算
-    // goodsType: 0, // 自营商品
-
+    const params: Recordable = {
     details: JSON.stringify(goods), // 购买的商品信息的数组
-    // expireMinutes: unref(orderSetInfo).closeMinute || 60, // 多少分钟未支付自动关闭本订单，传0不自动关闭订单
-    remark: unref(remark) || "sdadasda",
+    remark: unref(remark) || "无",
   };
 
   if (unref(isNeedLogistics)) {
@@ -142,15 +137,20 @@ async function createOrder() {
   submitLoading.value = true;
 
   try {
-    console.log(params)
     const res = await API_ORDER.orderCreate(params);
-
+    if (res.id){
+      Toast.loading("订单创建成功!正在支付....")
+      let params = {order_id: res.id, customer_id: useUserStore().userInfo.id}
+      await API_WALLET.walletPayment(params).then(() => {
+        setTimeout(() => {
+          Toast("订单支付成功!")
+        },2000)
+      }).catch(()=>{
+      })
+    }
     if (unref(tradeGoods).origin === 'cart') {
       cartEmptyHandle();
     }
-
-    // await payOrder(res.data.id);
-    Toast("订单创建成功!")
     setTimeout(() => {
       Toast.clear();
       submitLoading.value = false;

@@ -36,24 +36,25 @@ export function shoppingCartInfo(id: any) {
 /**
  * 购物车修改购买数量
  */
-export function shoppingCartModifyNumber(data?: Recordable) {
-  return request<ServiceResult<shoppingCartResult>>({
-    url: `/shopping-cart/modifyNumber`,
-    method: 'post',
-    data,
-  });
-}
+// export function shoppingCartModifyNumber(data?: Recordable) {
+//   return request<ServiceResult<shoppingCartResult>>({
+//     url: `/shopping-cart/modifyNumber`,
+//     method: 'post',
+//     data,
+//   });
+// }
 
 /**
  * 移除购物车中某条记录
  */
-export function shoppingCartRemove(data?: Recordable) {
-  return request<ServiceResult<shoppingCartResult>>({
-    url: `/shopping-cart/remove`,
-    method: 'post',
-    data,
+export function shoppingCartRemove(data: any) {
+  return request({
+    url: "/cart/delete/",
+    method: 'delete',
+    data: data
   });
 }
+
 
 /**
  * 购物车修改选中状态
@@ -64,6 +65,14 @@ export function shoppingCartSelect(data?: Recordable) {
     method: 'post',
     data,
   });
+}
+export function shoppingCartModifyNumber(id: any, number: any) {
+  console.log("number", number)
+  return request({
+    url: `/cart/update/${id}/`,
+    method: 'patch',
+    data: number
+  })
 }
 
 export default {

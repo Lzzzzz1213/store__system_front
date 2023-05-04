@@ -26,7 +26,6 @@ export function orderClose(data?: Recordable) {
  * 创建订单[下单]
  */
 export function orderCreate(data?: Recordable) {
-  console.log(data)
   return request({
     url: "/order/create/",
     method: "post",

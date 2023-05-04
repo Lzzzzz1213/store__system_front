@@ -69,16 +69,14 @@ function getList() {
   API_CART.shoppingCartInfo(useUserStore().userInfo.id)
     .then((res) => {
       list.value = res.data ?? [];
-      console.log(unref(list))
     })
     .finally(() => {
       listLoading.value = false;
     });
 }
 
-const onGoodChange = useDebounceFn((number, index) => {
-  const { key } = unref(list)[index];
-  cartNumberHandle(index, { key, number });
+const onGoodChange = useDebounceFn((number, id) => {
+  cartNumberHandle(id, number);
 }, 1000);
 
 function onDelete() {
@@ -108,25 +106,27 @@ function onDelete() {
     });
 }
 
-function cartNumberHandle(_index: number, { key, number }) {
+function cartNumberHandle(id: any, number: number) {
   Toast.loading({
     forbidClick: true,
     message: '修改中...',
     duration: 0,
   });
 
-  API_CART.shoppingCartModifyNumber({ number, key })
-    .then((res) => {
-      Toast.clear();
-      list.value = res.data?.items ?? [];
+  API_CART.shoppingCartModifyNumber(id, {number:number})
+    .then(() => {
+      setTimeout(() => {
+        Toast.clear();
+        getList()
+      },1000)
     })
     .catch((error) => {
-      console.log(error);
+      Toast.fail(error)
     });
 }
 
 function cartEmptyHandle() {
-  API_CART.shoppingCartEmpty()
+  API_CART.shoppingCartEmpty(useUserStore().userInfo.id)
     .then(() => {
       list.value = [];
     })
@@ -136,15 +136,22 @@ function cartEmptyHandle() {
 }
 
 function cartRemoveHandle() {
+  Toast.loading({
+    forbidClick: true,
+    message: '删除中...',
+    duration: 0,
+  });
   const keyStr = unref(selectedList)
-    .map((v) => v.key)
-    .join(',');
-  API_CART.shoppingCartRemove({ key: keyStr })
-    .then((res) => {
-      list.value = res.data?.items ?? [];
+    .map((v) => v.id)
+  API_CART.shoppingCartRemove({ ids: keyStr })
+    .then(() => {
+      setTimeout(() => {
+        Toast.clear()
+        getList()
+      },1500)
     })
     .catch((error) => {
-      console.log(error);
+      Toast.fail(error)
     });
 }
 
@@ -218,7 +225,7 @@ function onSubmit() {
                       :model-value="item.number"
                       async-change
                       class="sku-num-stepper"
-                      @change="onGoodChange($event, index)"
+                      @change="onGoodChange($event, item.id)"
                     />
                   </template>
                 </div>
