@@ -28,7 +28,7 @@ function onBannerClicked(linkUrl: string) {
     window.location.href = linkUrl;
   }
 }
-
+const name = ref<string>('')
 const list = ref<Recordable[]>([]);
 const listLoading = ref(false);
 const listFinished = ref(false);
@@ -53,6 +53,7 @@ function onPage() {
   const params = {
     currentPage: unref(currentPage),
     size: unref(size),
+    name: name.value
   };
   API_GOODS.goodsList(params)
     .then((res: any) => {
@@ -81,13 +82,15 @@ function onGoodClicked(id: number) {
       <div class="header">
         <form action="#" class="search-form">
           <van-search
+            v-model="name"
             class="search-field"
             shape="round"
             show-action
             placeholder="商品关键词"
+            @clear="onPage()"
           >
             <template #action>
-              <div style="color: #1ba784" >搜索</div>
+              <div style="color: #1ba784" @click="onPage()">搜索</div>
             </template>
           </van-search>
         </form>

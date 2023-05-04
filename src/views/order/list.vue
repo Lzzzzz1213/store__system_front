@@ -16,7 +16,6 @@ onBeforeMount(() => {
   }
 });
 const route = useRoute();
-
 const tabList = ref<Recordable[]>([
   { name: '全部', status: '' },
   { name: '待付款', status: '0' },
@@ -31,9 +30,10 @@ function onTabClicked() {
   listRef.value?.refresh();
 }
 
-const keyword = ref('');
+const keyword = ref<string>('');
 
 function onSearch() {
+  // loadList()
   listQueryType.value = 'search';
   listRef.value?.refresh();
 }
@@ -59,7 +59,7 @@ function loadList() {
   };
 
   if (unref(keyword)) {
-    params.orderNumber = unref(keyword); // 订单编号
+    params.order_no = unref(keyword); // 订单编号
   }
 
   listEmptyText.value = unref(listQueryType) === 'search' ? '未找到符合条件数据' : '暂无订单';
@@ -85,6 +85,7 @@ function loadListAfter(data) {
             show-action
             placeholder="搜索订单（订单编号）"
             @search="onSearch"
+            @clear="onSearch"
           >
             <template #action>
               <div v-if="keyword" style="color: #1ba784" @click="onSearch">订单搜索</div>
