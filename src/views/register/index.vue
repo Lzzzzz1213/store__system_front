@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, unref } from 'vue';
+import { computed, onMounted, ref, unref, reactive, UnwrapNestedRefs, Prop  } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { Toast } from 'vant';
 import Captcha from '@/components/Captcha/index.vue';
@@ -7,74 +7,183 @@ import PwdField from '@/components/PwdField/index.vue';
 import { nickList } from '@/constants/modules/user';
 import { isMobile, isPassWord, isSame } from '@/utils/validate';
 import { randomIntegerInRange } from '@/utils/lodash';
-import randomIcon from '@/assets/icons/shaizi.svg';
-
+import { Field, Form } from 'vant'
 import { useUserStore } from '@/store/modules/user';
 import { useSmsCode } from '@/hooks/shared/useSmsCode';
 
 const userStore = useUserStore();
+type InferPropType<T> = T extends null
+  ? any
+  : T extends { type: null | true }
+    ? any
+    : T extends ObjectConstructor | { type: ObjectConstructor }
+      ? { [key: string]: any }
+      : T extends Prop<infer V, infer _>
+        ? V
+        : T
 
+type FieldRule = UnwrapNestedRefs<InferPropType<typeof import('vant').Field>['rules'][number]>
 onMounted(() => {
-  onNickRandom();
 });
 
 const router = useRouter();
 const route = useRoute();
 
 const title = ref('免费注册');
-const { email, smsCode, smsTimer, smsText, captchaShow, onSmsBtnClicked, onSmsSend } = useSmsCode();
-const pwd = ref('');
-const pwd2 = ref('');
-
-const nick = ref('');
-function onNickRandom() {
-  nick.value = nickList[randomIntegerInRange(0, nickList.length - 1)];
-}
+const formData = reactive({
+  username: "",
+  password: "",
+  email: "",
+  id_card: "",
+  phone: "",
+  head_portrait_url: "https://img2.woyaogexing.com/2023/01/17/d2ca4e40164bd990d83e51d066b8053e.jpg",
+  type: "customer"
+})
+const form = reactive({
+  username: '',
+  password: '',
+  email: '',
+  id_card: '',
+  phone: ''
+})
 
 const agree = ref(true);
 
 const submitLoading = ref(false);
-const submitted = computed(() => {
-  return unref(email) && unref(nick) && unref(smsCode) && unref(pwd) && unref(pwd2);
-});
 
-function onSubmit() {
-  if (!isMobile(unref(email))) {
-    Toast('手机号格式错误');
-    return;
+// 验证用户名长度是否符合要求
+const validateUsernameLength = (rule: any, value: any, callback: Function) => {
+  if (value && (value.length < 6 || value.length > 20)) {
+    return callback(new Error("用户名长度必须在 6-20 个字符之间"))
   }
+  callback()
+}
 
-  if (!isPassWord(unref(pwd))) {
-    Toast('请设置8-25位(数字+字母)密码');
-    return;
+// 验证邮箱格式是否正确
+const validateEmailFormat = (rule: any, value: any, callback: Function) => {
+  // 正则表达式用于验证邮箱格式
+  const reg = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/
+  if (value && !reg.test(value)) {
+    return callback(new Error("请输入正确的邮箱格式"))
   }
+  callback()
+}
 
-  if (!isSame(unref(pwd), unref(pwd2))) {
-    Toast('2次输入密码不一致');
-    return;
+// 验证手机号长度是否等于11位
+const validateMobileLength = (rule: any, value: any, callback: Function) => {
+  if (value && value.length !== 11) {
+    return callback(new Error("手机号码长度必须为11位"))
   }
+  callback()
+}
 
-  const params = {
-    email: unref(email),
-    code: unref(smsCode),
-    nick: unref(nick),
-    pwd: unref(pwd),
-    autoLogin: true,
-  };
+// 验证身份证格式是否正确
+const validateIdCardFormat = (rule: any, value: any, callback: Function) => {
+  const checkDate = (year: number, month: number, day: number) => {
+    const date = new Date(`${year}/${month}/${day}`)
+    return (
+      date.getFullYear() === Number(year) && date.getMonth() + 1 === Number(month) && date.getDate() === Number(day)
+    )
+  }
+  if (!value) {
+    return callback(new Error("请输入身份证号码"))
+  }
+  const len = value.length
+  if (len !== 18) {
+    return callback(new Error("请输入18位身份证号码"))
+  }
+  if (!/^\d{17}(\d|x)$/i.test(value)) {
+    return callback(new Error("身份证号码格式错误"))
+  }
+  // 加权因子 Weight factor
+  const Wi = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
+  // 身份证号码校验码的设置
+  const VerificationCode = "10X98765432"
+  let sum = 0
+  for (let i = 0; i < 17; i++) {
+    sum += Number(value[i]) * Wi[i]
+  }
+  const modValue = sum % 11
+  const checkCode = value[17].toUpperCase() === "X" ? 10 : Number(value[17])
+  if (checkCode === Number(VerificationCode[modValue]) || (checkCode === 10 && modValue === 2)) {
+    const birthYear = value.slice(6, 10)
+    const birthMonth = value.slice(10, 12)
+    const birthDay = value.slice(12, 14)
+    if (!checkDate(birthYear, birthMonth, birthDay)) {
+      return callback(new Error("身份证号码格式错误"))
+    }
+    const sex = Number(value[16]) % 2 === 0 ? "女" : "男"
+    callback()
+  } else {
+    return callback(new Error("身份证号码格式错误"))
+  }
+}
+const validatePasswordLength = (rule: any, value: any, callback: Function) => {
+  if (value && (value.length < 6 || value.length > 20)) {
+    return callback(new Error("密码长度必须在 6-20 个字符之间"))
+  }
+  callback()
+}
+interface FormRules {
+  username: {
+    required: boolean
+    trigger: string
+    message: string
+  }[],
+  password: {
+    required: boolean
+    trigger: string
+    message: string
+  }[],
+  email: {
+    required: boolean
+    trigger: string
+    message: string
+  }[],
+  id_card: {
+    required: boolean
+    trigger: string
+    message: string
+  }[],
+  phone: {
+    required: boolean
+    trigger: string
+    message: string
+  }[]
+}
+const formRules: FormRules = {
+  username: [
+    { required: true, trigger: 'blur', message: '请输入用户名' },
+    { validator: validateUsernameLength, trigger: 'blur' }
+  ],
+  password: [
+    { required: true, trigger: 'blur', message: '请输入密码' },
+    { validator: validatePasswordLength, trigger: 'blur' }
+  ],
+  email: [
+    { required: true, trigger: 'blur', message: '请输入邮箱' },
+    { validator: validateEmailFormat, trigger: 'blur' }
+  ],
+  id_card: [
+    { required: true, trigger: 'blur', message: '请输入身份证' },
+    { validator: validateIdCardFormat, trigger: 'blur' }
+  ],
+  phone: [
+    { required: true, trigger: 'blur', message: '请输入手机号' },
+    { validator: validateMobileLength, trigger: 'blur' }
+  ]
+}
 
-  submitLoading.value = true;
+const formErrorMessage = reactive({
+  username: '',
+  password: '',
+  email: '',
+  id_card: '',
+  phone: ''
+})
 
-  userStore
-    .login({ provider: 'register', params })
-    .then(() => {
-      submitLoading.value = false;
-      route.query.redirect ? router.replace({ path: route.query.redirect as string }) : router.replace({ path: '/' });
-      Toast.success('注册成功');
-    })
-    .catch((error) => {
-      submitLoading.value = false;
-      console.error(error);
-    });
+const onSubmit = () => {
+  console.log(form)
 }
 </script>
 
@@ -84,43 +193,22 @@ function onSubmit() {
       <div class="h2">{{ title }}</div>
       <div class="form">
         <div class="form-item">
-          <div class="form-item-country">中国 +86</div>
+          <div class="form-item-country">用户名</div>
           <van-field
-            v-model="email"
+            v-model="formData.username"
             class="form-field"
             :border="false"
+            :rules="formRules.username"
             type="tel"
-            placeholder="请输入手机号"
+            placeholder="请输入用户名"
             clearable
           />
         </div>
         <div class="form-item">
-          <van-field v-model="nick" class="form-field" :border="false" type="tel" placeholder="请输入昵称" clearable>
-            <template #right-icon>
-              <img class="icon-random" :src="randomIcon" alt="" @click="onNickRandom" />
-            </template>
-          </van-field>
-        </div>
-        <div class="form-item">
-          <van-field
-            v-model="smsCode"
-            class="form-field"
-            :border="false"
-            type="number"
-            placeholder="请输入4位验证码"
-            clearable
-          />
-          <template v-if="smsTimer">
-            <span class="sms-btn countdown">{{ smsText }}</span>
-          </template>
-          <template v-else>
-            <span class="sms-btn" @click="onSmsBtnClicked">{{ smsText }}</span>
-          </template>
-        </div>
-        <div class="form-item">
+          <div class="form-item-country">密码</div>
           <PwdField
             key="pwd"
-            v-model="pwd"
+            v-model="formData.password"
             class="form-field"
             :border="false"
             placeholder="请设置8-25位(数字+字母)密码"
@@ -128,12 +216,35 @@ function onSubmit() {
           />
         </div>
         <div class="form-item">
-          <PwdField
-            key="pwd2"
-            v-model="pwd2"
+          <div class="form-item-country">邮箱</div>
+          <van-field
+            v-model="formData.email"
             class="form-field"
             :border="false"
-            placeholder="请再次输入密码"
+            type="tel"
+            placeholder="请输入邮箱"
+            clearable
+          />
+        </div>
+        <div class="form-item">
+          <div class="form-item-country">身份证</div>
+          <van-field
+            v-model="formData.id_card"
+            class="form-field"
+            :border="false"
+            type="tel"
+            placeholder="请输入身份证"
+            clearable
+          />
+        </div>
+        <div class="form-item">
+          <div class="form-item-country">手机号</div>
+          <van-field
+            v-model="formData.phone"
+            class="form-field"
+            :border="false"
+            type="tel"
+            placeholder="请输入手机号"
             clearable
           />
         </div>
@@ -158,7 +269,7 @@ function onSubmit() {
       </div>
     </div>
     <!-- 图形验证码 -->
-    <Captcha v-model:show="captchaShow" @success="onSmsSend" />
+<!--    <Captcha v-model:show="captchaShow" @success="onSmsSend" />-->
   </div>
 </template>
 
