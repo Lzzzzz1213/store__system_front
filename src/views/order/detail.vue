@@ -221,7 +221,7 @@ function getDetail() {
 }
 
 function getOrderLogistics() {
-  API_LOGISTICS.getOrderLogistics(order.value.id)
+  API_LOGISTICS.getOrderLogistics(route.query.id)
     .then((res) => {
     logistics.value = res.data
   })
