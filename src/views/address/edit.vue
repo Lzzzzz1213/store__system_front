@@ -69,10 +69,8 @@ export default {
   },
   created() {
     if (this.$route.query.id) {
-      API_USER.userShoppingAddressDetail({
-        id: this.$route.query.id,
-      }).then((res) => {
-        const info = res.data.info;
+      API_USER.userShoppingAddressDetail(this.$route.query.id).then((res) => {
+        const info = res.data;
         this.form = {
           id: info.id,
           name: info.linkMan,
@@ -82,7 +80,10 @@ export default {
           provinceCode: info.provinceId,
           cityCode: info.cityId,
           countyCode: info.districtId,
-          areaStr: this.formatAreaStr(info.provinceId, info.cityId, info.areaStr),
+          provinceStr: info.provinceStr,
+          cityStr: info.cityStr,
+          areaStr: info.areaStr,
+          fullArea: this.formatAreaStr(info.provinceStr, info.cityStr, info.areaStr),
         };
       });
     }

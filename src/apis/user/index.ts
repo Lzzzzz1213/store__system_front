@@ -162,11 +162,10 @@ export function userShoppingAddressDefault(id: any) {
 /**
  * 删除收货地址
  */
-export function userShoppingAddressDelete(data?: Recordable) {
+export function userShoppingAddressDelete(data: any) {
   return request({
-    url: `/user/shipping-address/delete`,
-    method: 'post',
-    data,
+    url: `/address/list/${data.id}/`,
+    method: 'delete',
   });
 }
 
@@ -194,10 +193,11 @@ export function userShoppingAddressList(id: any) {
 /**
  * 修改收货地址
  */
-export function userShoppingAddressUpdate(data?: Recordable) {
+export function userShoppingAddressUpdate(data: any) {
+  console.log(data)
   return request({
-    url: `/user/shipping-address/update`,
-    method: 'post',
+    url: `/address/list/${data.id}/`,
+    method: 'put',
     data,
   });
 }
